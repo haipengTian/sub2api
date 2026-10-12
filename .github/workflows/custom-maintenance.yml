@@ -1,0 +1,22 @@
+name: Custom maintenance checks
+
+on:
+  push:
+    paths: ['tools/custom/**', 'docs/custom/**', '.github/workflows/custom-maintenance.yml']
+  pull_request:
+    paths: ['tools/custom/**', 'docs/custom/**', '.github/workflows/custom-maintenance.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Shell syntax and lint
+        run: |
+          find tools/custom -name '*.sh' -print0 | xargs -0 -n1 bash -n
+          shellcheck tools/custom/sync-upstream.sh tools/custom/tests/sync-upstream.sh
+      - name: Isolated merge and failure tests
+        run: bash tools/custom/tests/sync-upstream.sh

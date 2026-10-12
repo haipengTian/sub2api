@@ -119,6 +119,8 @@ backend/.installed
 tests
 !deploy/tests/
 !deploy/tests/**
+!tools/custom/tests/
+!tools/custom/tests/**
 CLAUDE.md
 .claude
 scripts
@@ -133,6 +135,8 @@ deploy/docker-compose.override.yml
 .gocache/
 vite.config.js
 docs/*
+!docs/custom/
+!docs/custom/**
 !docs/PAYMENT.md
 !docs/PAYMENT_CN.md
 !docs/ADMIN_PAYMENT_INTEGRATION_API.md
