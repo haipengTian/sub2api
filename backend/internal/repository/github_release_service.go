@@ -108,6 +108,30 @@ func (c *githubReleaseClientError) FetchLatestRelease(ctx context.Context, repo 
 	return nil, c.err
 }
 
+func (c *githubReleaseClient) FetchCustomSyncState(ctx context.Context) (*service.CustomSyncState, error) {
+	req, err := c.newAPIRequest(ctx, "https://api.github.com/repos/haipengTian/sub2api/contents/custom-sync.json?ref=codex/custom-sync-state")
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Accept", "application/vnd.github.raw+json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GitHub sync status returned %d", resp.StatusCode)
+	}
+	var state service.CustomSyncState
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 64*1024)).Decode(&state); err != nil {
+		return nil, err
+	}
+	return &state, nil
+}
+
 func (c *githubReleaseClientError) FetchRecentReleases(ctx context.Context, repo string, perPage int) ([]*service.GitHubRelease, error) {
 	return nil, c.err
 }

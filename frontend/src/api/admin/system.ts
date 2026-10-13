@@ -12,6 +12,10 @@ export interface ReleaseInfo {
 }
 
 export interface VersionInfo {
+  update_channel?: 'custom'
+  upstream_version?: string
+  custom_image?: string
+  custom_sync?: { status: string; upstream_tag?: string; branch?: string; run_url?: string; conflicts?: string[] }
   current_version: string
   latest_version: string
   has_update: boolean

@@ -43,6 +43,10 @@ export const useAppStore = defineStore('app', () => {
   const hasUpdate = ref<boolean>(false)
   const buildType = ref<string>('source')
   const releaseInfo = ref<ReleaseInfo | null>(null)
+  const updateChannel = ref<string>('')
+  const upstreamVersion = ref<string>('')
+  const customImage = ref<string>('')
+  const customSync = ref<VersionInfo['custom_sync']>()
 
   // Auto-incrementing ID for toasts
   let toastIdCounter = 0
@@ -245,6 +249,10 @@ export const useAppStore = defineStore('app', () => {
     if (versionLoaded.value && !force) {
       return {
         current_version: currentVersion.value,
+        update_channel: updateChannel.value === 'custom' ? 'custom' : undefined,
+        upstream_version: upstreamVersion.value,
+        custom_image: customImage.value,
+        custom_sync: customSync.value,
         latest_version: latestVersion.value,
         has_update: hasUpdate.value,
         build_type: buildType.value,
@@ -266,6 +274,10 @@ export const useAppStore = defineStore('app', () => {
       hasUpdate.value = data.has_update
       buildType.value = data.build_type || 'source'
       releaseInfo.value = data.release_info || null
+      updateChannel.value = data.update_channel || ''
+      upstreamVersion.value = data.upstream_version || ''
+      customImage.value = data.custom_image || ''
+      customSync.value = data.custom_sync
       versionLoaded.value = true
       return data
     } catch (error) {
@@ -462,6 +474,10 @@ export const useAppStore = defineStore('app', () => {
     hasUpdate,
     buildType,
     releaseInfo,
+    updateChannel,
+    upstreamVersion,
+    customImage,
+    customSync,
 
     // Computed
     hasActiveToasts,

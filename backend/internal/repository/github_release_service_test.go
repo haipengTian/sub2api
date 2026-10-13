@@ -48,6 +48,47 @@ func newTestGitHubReleaseClient() *githubReleaseClient {
 	}
 }
 
+func TestGitHubCustomSyncState(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		code      int
+		body      string
+		wantError bool
+		wantState bool
+	}{
+		{"waiting conflict", 200, `{"upstream_tag":"v0.2.16","status":"conflict"}`, false, true},
+		{"not initialized", 404, "", false, false},
+		{"rate limited", 403, `{}`, true, false},
+		{"invalid json", 200, `broken`, true, false},
+		{"oversized state", 200, `{"status":"` + strings.Repeat("x", 65536) + `"}`, true, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				require.Equal(t, "/repos/haipengTian/sub2api/contents/custom-sync.json", r.URL.Path)
+				require.Equal(t, "codex/custom-sync-state", r.URL.Query().Get("ref"))
+				require.Equal(t, "application/vnd.github.raw+json", r.Header.Get("Accept"))
+				w.WriteHeader(tc.code)
+				_, _ = io.WriteString(w, tc.body)
+			}))
+			defer srv.Close()
+			client := newTestGitHubReleaseClient()
+			client.httpClient.Transport = &testTransport{testServerURL: srv.URL}
+			state, err := client.FetchCustomSyncState(context.Background())
+			if tc.wantError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			if tc.wantState {
+				require.NotNil(t, state)
+				require.Equal(t, "conflict", state.Status)
+			} else {
+				require.Nil(t, state)
+			}
+		})
+	}
+}
+
 func TestGitHubReleaseClientAPIRequestAuthorization(t *testing.T) {
 	tests := []struct {
 		name     string

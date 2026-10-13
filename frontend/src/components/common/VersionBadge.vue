@@ -6,11 +6,11 @@
         @click="toggleDropdown"
         class="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs transition-colors"
         :class="[
-          hasUpdate
+          needsAttention
             ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
             : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-800 dark:text-dark-400 dark:hover:bg-dark-700'
         ]"
-        :title="hasUpdate ? t('version.updateAvailable') : t('version.upToDate')"
+        :title="isCustomBuild ? t(customStatusKey) : hasUpdate ? t('version.updateAvailable') : t('version.upToDate')"
       >
         <span v-if="currentVersion" class="font-medium">v{{ currentVersion }}</span>
         <span
@@ -18,7 +18,7 @@
           class="h-3 w-12 animate-pulse rounded bg-gray-200 font-medium dark:bg-dark-600"
         ></span>
         <!-- Update indicator -->
-        <span v-if="hasUpdate" class="relative flex h-2 w-2">
+        <span v-if="needsAttention" class="relative flex h-2 w-2">
           <span
             class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"
           ></span>
@@ -89,7 +89,7 @@
                   <span v-else class="text-2xl font-bold text-gray-400 dark:text-dark-500">--</span>
                   <!-- Show check mark when up to date -->
                   <span
-                    v-if="!hasUpdate"
+                    v-if="isCustomBuild ? appStore.customSync?.status === 'up_to_date' && !hasCustomUpdate : !hasUpdate"
                     class="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30"
                   >
                     <svg
@@ -105,7 +105,10 @@
                     </svg>
                   </span>
                 </div>
-                <p class="mt-1 text-xs text-gray-500 dark:text-dark-400">
+                <p v-if="isCustomBuild" class="mt-1 text-xs text-gray-500 dark:text-dark-400">
+                  {{ t('version.customLatest') }}: v{{ latestCustomVersion }}
+                </p>
+                <p v-else class="mt-1 text-xs text-gray-500 dark:text-dark-400">
                   {{
                     hasUpdate
                       ? t('version.latestVersion') + ': v' + latestVersion
@@ -115,7 +118,26 @@
               </div>
 
               <!-- Priority 1: Update error (must check before hasUpdate) -->
-              <div v-if="updateError" class="space-y-2">
+              <div v-if="isCustomBuild" data-testid="custom-update-panel" class="space-y-3">
+                <p v-if="upstreamVersion" class="text-xs text-gray-500 dark:text-dark-400">
+                  {{ t('version.upstreamVersion') }}: v{{ upstreamVersion }}
+                </p>
+                <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800/50 dark:bg-amber-900/20 dark:text-amber-300">
+                  {{ t(customStatusKey) }}
+                  <p v-if="customPending" class="mt-1 text-xs">{{ t('version.customKeepCurrent') }}</p>
+                </div>
+                <template v-if="hasCustomUpdate">
+                  <p class="text-xs text-gray-500 dark:text-dark-400">{{ t('version.customDeployHint') }}</p>
+                  <pre class="overflow-x-auto rounded-lg bg-gray-100 p-2 text-xs dark:bg-dark-700">{{ customUpdateCommand }}</pre>
+                </template>
+                <a href="https://github.com/haipengTian/sub2api/actions/workflows/custom-auto-sync.yml" target="_blank" rel="noopener noreferrer" class="block text-center text-xs text-primary-600">
+                  {{ t('version.customProgress') }}
+                </a>
+                <a v-if="hasCustomUpdate" :href="`https://github.com/haipengTian/sub2api/releases/tag/v${latestCustomVersion}`" target="_blank" rel="noopener noreferrer" class="block text-center text-xs text-primary-600">
+                  {{ t('version.viewChangelog') }}
+                </a>
+              </div>
+              <div v-else-if="updateError" class="space-y-2">
                 <div
                   class="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800/50 dark:bg-red-900/20"
                 >
@@ -676,6 +698,23 @@ const latestVersion = computed(() => appStore.latestVersion)
 const hasUpdate = computed(() => appStore.hasUpdate)
 const releaseInfo = computed(() => appStore.releaseInfo)
 const buildType = computed(() => appStore.buildType)
+// Treat custom binaries as managed even while an older backend returns official update metadata.
+const isCustomBuild = computed(() => appStore.updateChannel === 'custom' || currentVersion.value.includes('-custom.'))
+const upstreamVersion = computed(() => appStore.upstreamVersion)
+const customVersionPattern = /^\d+\.\d+\.\d+-custom\.[1-9]\d*$/
+const latestCustomVersion = computed(() => customVersionPattern.test(latestVersion.value) ? latestVersion.value : currentVersion.value)
+const hasCustomUpdate = computed(() => hasUpdate.value && customVersionPattern.test(latestVersion.value))
+const customPending = computed(() => isCustomBuild.value && ['waiting', 'conflict', 'manual_review', 'checking', 'publishing', 'checks_failed', 'publish_failed'].includes(appStore.customSync?.status || 'unknown'))
+const needsAttention = computed(() => isCustomBuild.value ? hasCustomUpdate.value || customPending.value : hasUpdate.value)
+const customStatusKey = computed(() => {
+  const keys: Record<string, string> = {
+    waiting: 'version.customWaiting', conflict: 'version.customConflict', checking: 'version.customChecking',
+    publishing: 'version.customPublishing', checks_failed: 'version.customChecksFailed', publish_failed: 'version.customPublishFailed',
+    manual_review: 'version.customManualReview'
+  }
+  return keys[appStore.customSync?.status || 'unknown'] || (hasCustomUpdate.value ? 'version.customAvailable' : appStore.customSync?.status === 'up_to_date' ? 'version.customUpToDate' : 'version.customUnknown')
+})
+const customUpdateCommand = computed(() => `cd /opt/server-ops/sub2api\nbash update.sh ghcr.io/haipengtian/sub2api:${latestCustomVersion.value}`)
 
 // Update process states (local to this component)
 const updating = ref(false)
@@ -752,6 +791,7 @@ async function refreshVersion(force = true) {
 }
 
 async function handleUpdate() {
+  if (isCustomBuild.value) return
   if (updating.value) return
 
   updating.value = true
@@ -826,6 +866,7 @@ function formatPublishedAt(publishedAt: string): string {
 }
 
 async function handleRollback() {
+  if (isCustomBuild.value) return
   if (!isAdmin.value) return
   if (rollingBack.value || !selectedRollbackVersion.value) return
 

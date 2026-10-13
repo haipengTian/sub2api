@@ -1,6 +1,17 @@
 name: Release
 
 on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      simple_release:
+        type: boolean
+        default: false
+      dry_run:
+        type: boolean
+        default: false
   push:
     tags:
       - 'v*'
@@ -30,7 +41,7 @@ permissions:
 
 env:
   SIMPLE_RELEASE: ${{ inputs.simple_release == true || vars.SIMPLE_RELEASE == 'true' }}
-  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
+  DRY_RUN: ${{ inputs.dry_run == true }}
 
 jobs:
   prepare:
@@ -71,12 +82,12 @@ jobs:
           python "$RUNNER_TEMP/release-tools/release_matrix.py" plan "${args[@]}"
       - uses: actions/upload-artifact@v7
         with:
-          name: release-tooling
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-release-tooling
           path: ${{ runner.temp }}/release-tools/
           retention-days: 1
       - uses: actions/upload-artifact@v7
         with:
-          name: version-file
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-version-file
           path: backend/cmd/server/VERSION
           retention-days: 1
 
@@ -101,7 +112,7 @@ jobs:
         working-directory: frontend
       - uses: actions/upload-artifact@v7
         with:
-          name: frontend-dist
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-frontend-dist
           path: backend/internal/web/dist/
           retention-days: 1
 
@@ -121,15 +132,15 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
-          name: release-tooling
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-release-tooling
           path: ${{ runner.temp }}/release-tools/
       - uses: actions/download-artifact@v8
         with:
-          name: version-file
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-version-file
           path: backend/cmd/server/
       - uses: actions/download-artifact@v8
         with:
-          name: frontend-dist
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-frontend-dist
           path: backend/internal/web/dist/
       - uses: actions/setup-go@v6
         with:
@@ -177,7 +188,7 @@ jobs:
         run: python "$RUNNER_TEMP/release-tools/release_matrix.py" collect --version "$RELEASE_VERSION" --sha "$RELEASE_SHA" --goos "$TARGET_OS" --goarch "$TARGET_ARCH" --output matrix-output
       - uses: actions/upload-artifact@v7
         with:
-          name: release-binary-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-release-binary-${{ matrix.goos }}-${{ matrix.goarch }}
           path: matrix-output/
           if-no-files-found: error
           retention-days: 1
@@ -209,11 +220,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
-          name: release-tooling
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-release-tooling
           path: ${{ runner.temp }}/release-tools/
       - uses: actions/download-artifact@v8
         with:
-          pattern: release-binary-*
+          pattern: ${{ inputs.dry_run && 'validation' || 'publish' }}-release-binary-*
           path: release-input
           merge-multiple: true
       - uses: actions/setup-python@v6
@@ -284,7 +295,7 @@ jobs:
         if: ${{ env.DRY_RUN == 'true' }}
         uses: actions/upload-artifact@v7
         with:
-          name: release-dry-run-report
+          name: ${{ inputs.dry_run && 'validation' || 'publish' }}-release-dry-run-report
           path: |
             dist/checksums.txt
             dist/artifacts.json

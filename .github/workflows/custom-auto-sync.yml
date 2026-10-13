@@ -1,0 +1,125 @@
+name: Custom upstream fusion and release
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      retry:
+        description: 'Retry fusion/checks, or resume publication of an already validated tag'
+        type: boolean
+        default: false
+
+# A single coordinator owns candidate and status publication. Production is never changed here.
+concurrency:
+  group: custom-upstream-fusion
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    if: github.repository == 'haipengTian/sub2api'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      ready: ${{ steps.merge.outputs.ready }}
+      resume: ${{ steps.merge.outputs.resume }}
+      sha: ${{ steps.merge.outputs.sha }}
+      base: ${{ steps.merge.outputs.base }}
+      tag: ${{ steps.merge.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Fetch official stable tag and merge into personal branch
+        id: merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RETRY: ${{ inputs.retry }}
+        run: |
+          args=(prepare)
+          if [[ "$RETRY" == true ]]; then args+=(--retry); fi
+          python tools/custom/auto_release.py "${args[@]}"
+
+  checks:
+    needs: prepare
+    if: needs.prepare.outputs.ready == 'true' && needs.prepare.outputs.resume != 'true'
+    uses: ./.github/workflows/backend-ci.yml
+    with:
+      source_ref: ${{ needs.prepare.outputs.sha }}
+
+  build-validation:
+    needs: [prepare, checks]
+    if: needs.prepare.outputs.ready == 'true' && needs.prepare.outputs.resume != 'true'
+    uses: ./.github/workflows/release.yml
+    permissions:
+      contents: write
+      packages: write
+    with:
+      tag: ${{ needs.prepare.outputs.sha }}
+      dry_run: true
+
+  promote:
+    needs: [prepare, checks, build-validation]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Promote only the validated commit and create custom tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ needs.prepare.outputs.base }}
+          SHA: ${{ needs.prepare.outputs.sha }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: python tools/custom/auto_release.py promote --base "$BASE" --sha "$SHA" --tag "$TAG"
+
+  publish:
+    needs: [prepare, promote]
+    if: ${{ !cancelled() && needs.prepare.outputs.ready == 'true' && (needs.prepare.outputs.resume == 'true' || needs.promote.result == 'success') }}
+    uses: ./.github/workflows/release.yml
+    permissions:
+      contents: write
+      packages: write
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+    # Called explicitly: a tag pushed with GITHUB_TOKEN does not start another push workflow.
+
+  record-result:
+    needs: [prepare, checks, build-validation, promote, publish]
+    if: always() && needs.prepare.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Record validation or publication result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECKS: ${{ needs.checks.result }}
+          BUILD: ${{ needs.build-validation.result }}
+          PROMOTE: ${{ needs.promote.result }}
+          PUBLISH: ${{ needs.publish.result }}
+          RESUME: ${{ needs.prepare.outputs.resume }}
+        run: |
+          status=checks_failed
+          if [[ "$RESUME" == true || ( "$CHECKS" == success && "$BUILD" == success && "$PROMOTE" == success ) ]]; then
+            status=publish_failed
+            if [[ "$PUBLISH" == success ]]; then status=published; fi
+          fi
+          python tools/custom/auto_release.py finish --status "$status"

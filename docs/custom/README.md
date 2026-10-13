@@ -5,12 +5,13 @@
 
 ## 当前基线
 
-2026-10-13 已重新获取并核实个人 `origin/main` 和官方 `main`，两者均为
-`ab80abc6d1f929a6864c8804fd077b509d21fda2`，VERSION 为 `0.2.15`。
-本地 main 与 `codex/custom-deployment` 已从 `3a6fd1c9db07203ca308aaba69e502bc1f35b307` 快进 35 个提交。
-官方已配置为 `upstream`。此前 GitHub 连接失败，现已恢复并完成本次基线同步；没有代码冲突。
-当前 main 比官方稳定 tag `v0.2.15` 的提交多 36 个提交，发布记录应明确这是所选官方 main 快照。
-没有具体二开业务需求；本次增加维护工具，不改变网关产品行为。
+个人 `v0.2.15-custom.1` 已发布，镜像为 `ghcr.io/haipengtian/sub2api:0.2.15-custom.1`。
+该版本基于当时选定的官方 main 快照；后续以明确的官方稳定 tag 为融合目标，不以仓库当前分支名代替发布记录。
+官方远程为 `upstream`，个人远程为 `origin`。
+
+新增自动融合流程见 [自动融合上游与二开发布](auto-updates.md)：定时获取官方稳定版，
+建立融合分支，通过 CI 与发布试构建后发布 custom 版本；冲突时保留当前部署并提示等待。
+以下手动流程仍用于处理冲突、人工检查发布工作流变动和主动发布二开功能。
 
 ## 每次同步
 
@@ -68,7 +69,7 @@ pnpm run build
 复用 `.github/workflows/release.yml`，不要部署官方镜像替代个人镜像。
 确认个人仓库 Actions 已启用、工作流可以写入 Packages，首次发布后确认 GHCR 包可见性。
 
-1. 选择与代码/官方基线对应的个人版本，如 `v0.2.15-custom.1`。这是命名示例，尚未发布。
+1. 选择与代码/官方基线对应的个人版本，如 `v0.2.15-custom.2`。已存在的标签不能复用。
 2. 更新发布记录（模板见 `release-template.md`），提交到个人 main。
 3. 在 GitHub Actions 的 Release 页面选择 `main`，填写已推送的源代码分支，勾选 `dry_run`。
    amd64 服务器可同时勾选 `simple_release`；arm64 使用完整发布。此步只验证构建，不发布。
@@ -77,19 +78,19 @@ pnpm run build
    ```bash
    test -z "$(git status --porcelain)"
    source_sha=$(git rev-parse HEAD)
-   git tag -a v0.2.15-custom.1 "$source_sha" -m 'Sub2API custom release'
-   git push origin v0.2.15-custom.1
+   git tag -a v0.2.15-custom.2 "$source_sha" -m 'Sub2API custom release'
+   git push origin v0.2.15-custom.2
    ```
 
    tag 自动触发 Release。默认完整发布；要让 tag 触发简化发布，可提前设置仓库变量 `SIMPLE_RELEASE=true`。
    不要在 tag 发布正在执行时重复手动发布同一 tag。
 5. 等待 Release 的所有构建、验证与发布成功。目标镜像为
-   `ghcr.io/haipengtian/sub2api:0.2.15-custom.1`。
+   `ghcr.io/haipengtian/sub2api:0.2.15-custom.2`（示例版本，等待实际发布验证）。
 6. 记录 GitHub 发布 URL、源 SHA、镜像摘要与架构，转到 `server-ops/sub2api/README.md` 首次安装或升级。
 
 Release 会把个人默认分支的 VERSION 更新为发布版本，也会生成 `latest`。
 服务器脚本只接受固定 custom 标签或 sha256，并在拉取后保存镜像摘要。
-个人标签可能被上游更新检查识别成预发布；生产更新以本运维流程为准，不从产品内置更新入口切换回官方产物。
+修复后的程序单独查询个人 custom 发布，并展示官方融合状态；生产升级继续使用运维脚本，不从内置更新入口切换回官方产物。
 
 ## 以后做二开
 

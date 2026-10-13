@@ -19,6 +19,21 @@ export default {
 
   // Version Badge
   version: {
+    customLatest: 'Latest custom version',
+    upstreamVersion: 'Official upstream version',
+    customWaiting: 'Waiting for a merged custom release',
+    customConflict: 'Merge conflicts found; waiting for a custom release',
+    customManualReview: 'Upstream workflow changes need maintainer review; waiting for a custom release',
+    customChecking: 'Merge branch created; validating the custom build',
+    customPublishing: 'Validation passed; publishing the custom image',
+    customChecksFailed: 'Validation failed; waiting for a custom release',
+    customPublishFailed: 'Custom image publication incomplete; awaiting retry',
+    customKeepCurrent: 'Keep running the current version. No automatic switch to official binaries.',
+    customDeployHint: 'A custom release is available. Run these commands on the server to back up and upgrade:',
+    customProgress: 'View merge and release progress',
+    customAvailable: 'A new custom release is available',
+    customUpToDate: 'The custom build includes the latest official stable version',
+    customUnknown: 'Release status unavailable; keep running the current version',
     currentVersion: 'Current Version',
     latestVersion: 'Latest Version',
     upToDate: "You're running the latest version.",

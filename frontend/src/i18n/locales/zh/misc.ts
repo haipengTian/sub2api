@@ -19,6 +19,21 @@ export default {
 
   // Version Badge
   version: {
+    customLatest: '最新二开版本',
+    upstreamVersion: '官方上游版本',
+    customWaiting: '等待二开版本融合发布',
+    customConflict: '上游融合存在冲突，等待二开版本融合发布',
+    customManualReview: '上游调整了发布流程，需要人工融合，等待二开版本发布',
+    customChecking: '融合分支已创建，正在验证二开版本',
+    customPublishing: '验证已通过，正在发布二开镜像',
+    customChecksFailed: '融合验证未通过，等待二开版本融合发布',
+    customPublishFailed: '二开镜像发布未完成，等待重新发布',
+    customKeepCurrent: '继续使用当前版本，不会自动切换到官方程序。',
+    customDeployHint: '新的二开版本已发布。请在服务器运行以下命令，备份后升级镜像：',
+    customProgress: '查看融合与发布进度',
+    customAvailable: '新的二开版本已发布',
+    customUpToDate: '当前二开版本已包含最新官方稳定版',
+    customUnknown: '暂时无法确认发布状态，继续使用当前版本',
     currentVersion: '当前版本',
     latestVersion: '最新版本',
     upToDate: '已是最新版本',

@@ -78,6 +78,8 @@ Desktop.ini
 # ===================
 # 临时文件
 # ===================
+__pycache__/
+*.pyc
 tmp/
 temp/
 *.tmp
@@ -121,6 +123,8 @@ tests
 !deploy/tests/**
 !tools/custom/tests/
 !tools/custom/tests/**
+tools/custom/**/__pycache__/
+tools/custom/**/*.pyc
 CLAUDE.md
 .claude
 scripts

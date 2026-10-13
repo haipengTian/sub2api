@@ -19,4 +19,6 @@ jobs:
           find tools/custom -name '*.sh' -print0 | xargs -0 -n1 bash -n
           shellcheck tools/custom/sync-upstream.sh tools/custom/tests/sync-upstream.sh
       - name: Isolated merge and failure tests
-        run: bash tools/custom/tests/sync-upstream.sh
+        run: |
+          bash tools/custom/tests/sync-upstream.sh
+          python -m unittest discover -s tools/custom/tests -p 'test_*.py'
