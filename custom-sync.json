@@ -1,0 +1,13 @@
+{
+  "upstream_tag": "v0.2.16",
+  "upstream_sha": "01842576b3d5c1e2545b5a99ad555d36e28ed306",
+  "base_sha": "b6085cfebc584c015237f2dc74bf26a48a25bd65",
+  "branch": "codex/sync-v0.2.16-custom.1-38434349865-1",
+  "tag": "v0.2.16-custom.1",
+  "status": "checking",
+  "conflicts": [],
+  "candidate_sha": "345267082d12bae86ae9c84781e224aad6c7ebf8",
+  "checked_at": "2026-10-13T16:55:04.284851+00:00",
+  "run_id": "38434349865",
+  "run_url": "https://github.com/haipengTian/sub2api/actions/runs/38434349865"
+}
