@@ -1,11 +1,13 @@
 <template>
-  <div class="card">
+  <div class="card relative" :aria-busy="loading">
+    <RefreshIndicator :active="loading" />
     <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-dark-700">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t('dashboard.recentUsage') }}</h2>
       <span class="badge badge-gray">{{ t('dashboard.last7Days') }}</span>
     </div>
     <div class="p-6">
-      <div v-if="loading" class="flex items-center justify-center py-12">
+      <LoadingPlaceholder v-if="showPlaceholder && isModern" kind="list" />
+      <div v-else-if="showPlaceholder" class="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
       </div>
       <div v-else-if="data.length === 0" class="py-8">
@@ -47,11 +49,16 @@ import EmptyState from '@/components/common/EmptyState.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { formatDateTime } from '@/utils/format'
 import type { UsageLog } from '@/types'
+import { useLoadingPresentation } from '@/composables/useLoadingPresentation'
+import LoadingPlaceholder from '@/components/custom/LoadingPlaceholder.vue'
+import RefreshIndicator from '@/components/custom/RefreshIndicator.vue'
 
-defineProps<{
+const props = defineProps<{
   data: UsageLog[]
   loading: boolean
+  resolved?: boolean
 }>()
+const { isModern, showPlaceholder } = useLoadingPresentation(() => props.loading, () => props.data.length > 0, () => !!props.resolved)
 const { t } = useI18n()
 const formatCost = (c: number) => c.toFixed(4)
 </script>

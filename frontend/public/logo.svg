@@ -1,32 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title id="title">Sub2API</title>
-  <desc id="desc">An interlocking S symbol representing subscription routing into APIs.</desc>
-  <defs>
-    <linearGradient id="s2a-bg" x1="72" y1="44" x2="442" y2="478" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#142B56"/>
-      <stop offset=".52" stop-color="#0A1A39"/>
-      <stop offset="1" stop-color="#061127"/>
-    </linearGradient>
-    <radialGradient id="s2a-ambient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(168 92) rotate(51) scale(342 382)">
-      <stop stop-color="#3E68B0" stop-opacity=".28"/>
-      <stop offset="1" stop-color="#3E68B0" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="s2a-brand" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#79F4BD"/>
-      <stop offset=".48" stop-color="#39D9E7"/>
-      <stop offset="1" stop-color="#3875F6"/>
-    </linearGradient>
-    <filter id="s2a-shadow" x="-25%" y="-25%" width="150%" height="165%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy=".55" stdDeviation=".65" flood-color="#020817" flood-opacity=".34"/>
-    </filter>
-  </defs>
-
-  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#s2a-bg)"/>
-  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#s2a-ambient)"/>
-  <rect x="16.75" y="16.75" width="478.5" height="478.5" rx="119.25" fill="none" stroke="#A5BFFF" stroke-opacity=".16" stroke-width="1.5"/>
-
-  <g transform="translate(52 52) scale(17)" fill="none" stroke="url(#s2a-brand)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.7" filter="url(#s2a-shadow)">
-    <path d="m19.25 7.65-2.55-3.2a1.33 1.33 0 0 0-1.03-.5H8.58c-.34 0-.67.13-.91.37L4.15 7.65c-.93.88-.6 1.52.65 2.3l9.55 5.97"/>
-    <path d="m4.75 16.35 2.55 3.2c.25.31.63.5 1.03.5h7.09c.34 0 .67-.13.91-.37l3.52-3.33c.93-.88.6-1.52-.65-2.3L9.65 8.08"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Sub2API · 像素奥特曼飞行</title>
+  <desc id="desc">银色头盔、金色双眼、红银战衣和蓝色胸灯的像素英雄，伸出手臂向右上方飞行，身后带有流动的能量尾焰。</desc>
+  <style>
+    .hero { animation: flight 2.8s ease-in-out infinite; }
+    .trail { animation: thrust 1.2s steps(3, end) infinite; }
+    .star { animation: drift 2.8s steps(4, end) infinite; }
+    @keyframes flight { 0%, 100% { transform: translate(0, 1px); } 50% { transform: translate(1px, -1px); } }
+    @keyframes thrust { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+    @keyframes drift { 0%, 100% { transform: translate(0, 0); opacity: .7; } 50% { transform: translate(-2px, 2px); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .hero, .trail, .star { animation: none; } }
+  </style>
+  <!-- A forest-green tile keeps the small silver silhouette legible. -->
+  <path fill="#145637" d="M8 2h48v2h4v4h2v48h-2v4h-4v2H8v-2H4v-4H2V8h2V4h4z"/>
+  <path fill="#1d6945" d="M8 4h44v2H8zM4 8h2v32H4z"/>
+  <g class="star" fill="#a3d3b5">
+    <path d="M12 12h2v2h-2zM54 42h2v2h-2zM44 52h2v2h-2zM10 32h2v-2h2v2h2v2h-2v2h-2v-2h-2z"/>
+  </g>
+  <g class="hero">
+    <g class="trail">
+      <path fill="#66c99a" d="M4 48h8v-2h6v-2h6v4h-6v2h-6v2H4zM8 56h10v-2h6v-2h6v4h-6v2H8z"/>
+      <path fill="#c6f1da" d="M12 46h8v-2h4v2h-4v2h-8zM18 52h8v-2h4v2h-4v2h-8z"/>
+    </g>
+    <!-- Raised arm and an outstretched silver fist. -->
+    <path fill="#223b34" d="M38 28h4v-6h4v-6h4v-4h8v10h-4v4h-4v6h-4v6h-8z"/>
+    <path fill="#b4c8ca" d="M40 28h4v-6h4v-6h4v-2h4v6h-4v4h-4v6h-4v4h-4z"/>
+    <path fill="#eef5f1" d="M48 16h4v-2h4v4h-4v4h-4zM42 26h2v-2h4v4h-4v4h-2z"/>
+    <!-- Boots, red suit and silver shoulder armor. -->
+    <path fill="#223b34" d="M20 30h14v-2h6v6h6v10h-6v6h-6v4H22v-4H12v-8h6v-6h2z"/>
+    <path fill="#cc4548" d="M24 32h12v2h6v8h-6v6h-6v4h-6v-4H14v-4h8v-6h2z"/>
+    <path fill="#e5eeea" d="M22 32h8v4h-4v4h-4v4h-6v2h-2v-2h4v-6h4zM32 34h6v2h4v4h-6v-2h-4zM28 46h6v4h-4v2h-6v-4h4z"/>
+    <path fill="#91aeb3" d="M16 44h6v4h-6zM24 50h6v2h-6z"/>
+    <!-- Central helmet crest, golden eyes and a dark jaw. -->
+    <path fill="#223b34" d="M28 12h4V8h4v4h6v4h4v12h-4v4H26v-4h-4V16h6z"/>
+    <path fill="#bacdd0" d="M28 14h4v-4h2v4h6v4h4v8h-4v4H28v-4h-4V18h4z"/>
+    <path fill="#f2f6f2" d="M28 14h4v4h-4v4h-4v-4h4zM34 14h4v4h-4zM32 10h2v14h-2z"/>
+    <path fill="#f6d66b" d="M26 20h4v2h2v2h-6zM36 20h6v4h-6z"/>
+    <path fill="#223b34" d="M30 26h8v2h-8z"/>
+    <path fill="#edf4f0" d="M32 28h4v2h-4z"/>
+    <!-- Steady chest light: no flashing. -->
+    <path fill="#223b34" d="M30 34h6v6h-6z"/>
+    <path fill="#5fcbeb" d="M32 34h2v4h-2z"/>
+    <path fill="#def8ff" d="M32 34h2v2h-2z"/>
   </g>
 </svg>

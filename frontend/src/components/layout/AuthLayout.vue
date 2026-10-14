@@ -1,12 +1,28 @@
 <template>
-  <div class="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+  <div class="auth-shell relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+    <div class="auth-appearance"><AppearanceControls /></div>
+    <aside v-if="isModern" class="modern-auth-brand">
+      <router-link to="/" class="modern-auth-logo">
+        <img :src="siteLogo || '/logo.svg'" :alt="siteName" />
+        <span>{{ siteName }}</span>
+      </router-link>
+      <div>
+        <h1>{{ t('appearance.workspace') }}</h1>
+        <p>{{ t('appearance.workspaceDescription') }}</p>
+      </div>
+      <div class="modern-auth-features">
+        <span>{{ t('appearance.featureAccess') }}</span>
+        <span>{{ t('appearance.featureUsage') }}</span>
+        <span>{{ t('appearance.featureKeys') }}</span>
+      </div>
+    </aside>
     <!-- Background -->
     <div
-      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-primary-50/30 to-gray-100 dark:from-dark-950 dark:via-dark-900 dark:to-dark-950"
+      class="auth-decoration absolute inset-0 bg-gradient-to-br from-gray-50 via-primary-50/30 to-gray-100 dark:from-dark-950 dark:via-dark-900 dark:to-dark-950"
     ></div>
 
     <!-- Decorative Elements -->
-    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+    <div class="auth-decoration pointer-events-none absolute inset-0 overflow-hidden">
       <!-- Gradient Orbs -->
       <div
         class="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-primary-400/20 blur-3xl"
@@ -25,9 +41,9 @@
     </div>
 
     <!-- Content Container -->
-    <div class="relative z-10 w-full max-w-md">
+    <div class="auth-content relative z-10 w-full max-w-md">
       <!-- Logo/Brand -->
-      <div class="mb-8 text-center">
+      <div v-if="!isModern" class="mb-8 text-center">
         <!-- Custom Logo or Default Logo -->
         <template v-if="settingsLoaded">
           <div
@@ -45,7 +61,7 @@
       </div>
 
       <!-- Card Container -->
-      <div class="card-glass rounded-2xl p-8 shadow-glass">
+      <div class="auth-card card-glass rounded-2xl p-8 shadow-glass">
         <slot />
       </div>
 
@@ -66,6 +82,12 @@
 import { computed, onMounted } from 'vue'
 import { useAppStore } from '@/stores'
 import { sanitizeUrl } from '@/utils/url'
+import { useI18n } from 'vue-i18n'
+import { useAppearance } from '@/composables/useAppearance'
+import AppearanceControls from '@/components/custom/AppearanceControls.vue'
+
+const { t } = useI18n()
+const { isModern } = useAppearance()
 
 const appStore = useAppStore()
 

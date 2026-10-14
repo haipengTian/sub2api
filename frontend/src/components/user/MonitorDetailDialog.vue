@@ -12,7 +12,7 @@
       {{ t('channelStatus.detailLoadError') }}
     </div>
     <div v-else class="overflow-x-auto">
-      <table class="w-full text-left text-sm">
+      <table class="modern-native-table w-full text-left text-sm">
         <thead class="border-b border-gray-200 dark:border-dark-700">
           <tr class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
             <th class="py-2 pr-3">{{ t('channelStatus.detailColumns.model') }}</th>

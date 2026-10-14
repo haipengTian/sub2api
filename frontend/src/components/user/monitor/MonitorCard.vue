@@ -1,11 +1,11 @@
 <template>
   <button
     type="button"
-    class="group text-left p-5 rounded-2xl min-h-[280px] w-full bg-white/70 backdrop-blur-xl border border-gray-200/80 shadow-card dark:bg-dark-800/60 dark:border-dark-700/70 hover:-translate-y-1 hover:shadow-card-hover dark:hover:border-primary-500/30 hover:border-gray-300 transition-all duration-300 ease-out flex flex-col"
+    class="monitor-card group text-left p-5 rounded-2xl min-h-[280px] w-full bg-white/70 backdrop-blur-xl border border-gray-200/80 shadow-card dark:bg-dark-800/60 dark:border-dark-700/70 hover:-translate-y-1 hover:shadow-card-hover dark:hover:border-primary-500/30 hover:border-gray-300 transition-all duration-300 ease-out flex flex-col"
     @click="emit('click')"
   >
     <!-- Header: icon + name/model + status chip -->
-    <div class="flex items-start gap-3">
+    <div class="monitor-card-heading flex items-start gap-3">
       <span
         class="w-9 h-9 rounded-xl ring-1 ring-black/5 dark:ring-white/10 grid place-items-center flex-shrink-0"
         :class="[providerGradient(item.provider), providerTintClass]"
@@ -45,6 +45,7 @@
 
     <!-- Metrics -->
     <MonitorMetricPair
+      class="monitor-card-metrics"
       primary-icon="bolt"
       :primary-label="t('monitorCommon.dialogLatency')"
       :primary-value="formatLatency(item.primary_latency_ms)"
@@ -56,20 +57,23 @@
     />
 
     <!-- 配额模式：最新用量/余额快照（服务端已按系统开关剥离，此处 flag 为纵深防御） -->
-    <MonitorQuotaView v-if="quotaVisible" :snapshot="item.latest_quota" class="mt-2" />
+    <MonitorQuotaView v-if="quotaVisible" :snapshot="item.latest_quota" class="monitor-card-quota mt-2" />
 
     <!-- Divider -->
-    <div class="mt-4 border-t border-gray-100 dark:border-dark-700/60"></div>
+    <div class="monitor-card-divider mt-4 border-t border-gray-100 dark:border-dark-700/60"></div>
 
     <!-- Availability row -->
-    <MonitorAvailabilityRow
-      :window-label="availabilityLabel"
-      :value="availabilityValue"
-      :samples-label="extraModelsCountLabel"
-    />
+    <div class="monitor-card-availability">
+      <MonitorAvailabilityRow
+        :window-label="availabilityLabel"
+        :value="availabilityValue"
+        :samples-label="extraModelsCountLabel"
+      />
+    </div>
 
     <!-- Timeline -->
     <MonitorTimeline
+      class="monitor-card-timeline"
       :buckets="item.timeline"
       :countdown-seconds="countdownSeconds"
     />

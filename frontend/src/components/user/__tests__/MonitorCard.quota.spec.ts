@@ -56,6 +56,26 @@ function mountCard(item: UserMonitorView) {
 }
 
 describe('MonitorCard quota snapshot visibility', () => {
+  it('groups availability and extra model information without fragment attribute warnings', () => {
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    isQuotaVisible.mockReturnValue(true)
+    const wrapper = mount(MonitorCard, {
+      props: {
+        item: makeItem({
+          primary_model: 'kimi-k2',
+          extra_models: [{ model: 'kimi-mini', status: 'operational', latency_ms: 500 }],
+          latest_quota: { source: 'cn_quota', success: true, plan_level: 'demo', fetched_at: '2026-10-14T00:00:00Z' },
+        }),
+        window: '7d', availabilityValue: 99.8, countdownSeconds: 0,
+      },
+    })
+    expect(wrapper.get('.monitor-card-availability').text()).toContain('99.80')
+    expect(wrapper.get('.monitor-card-availability').text()).toContain('monitorCommon.extraModelsCount')
+    expect(wrapper.find('[data-testid="monitor-quota-view"]').exists()).toBe(true)
+    expect(warning.mock.calls.some(args => String(args[0]).includes('Extraneous non-props attributes'))).toBe(false)
+    wrapper.unmount()
+    warning.mockRestore()
+  })
   it('hides the quota block when the system switch is off even if data exists', () => {
     isQuotaVisible.mockReturnValue(false)
     const wrapper = mountCard(

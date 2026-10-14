@@ -6,7 +6,7 @@
     <div v-else-if="items.length === 0" class="py-2 text-center text-xs text-gray-400">
       {{ t('admin.dashboard.noDataAvailable') }}
     </div>
-    <table v-else class="w-full text-xs">
+    <table v-else class="modern-compact-table w-full text-xs">
       <tbody>
         <tr
           v-for="user in items"

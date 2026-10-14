@@ -1,14 +1,17 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
+    <div class="admin-dashboard relative space-y-6" :aria-busy="dashboardBusy">
+      <RefreshIndicator :active="dashboardBusy" />
+      <AdminDashboardOverview v-if="isModern" :stats="stats" :simple-mode="authStore.isSimpleMode" />
       <!-- Loading State -->
-      <div v-if="loading" class="flex items-center justify-center py-12">
+      <LoadingPlaceholder v-if="loading && isModern" kind="dashboard" />
+      <div v-else-if="loading" class="flex items-center justify-center py-12">
         <LoadingSpinner />
       </div>
 
       <template v-else-if="stats">
         <!-- Row 1: Core Stats -->
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="admin-metric-grid grid grid-cols-2 gap-4 lg:grid-cols-4">
           <!-- Total API Keys -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
@@ -20,7 +23,8 @@
                   {{ t('admin.dashboard.apiKeys') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  {{ stats.total_api_keys }}
+                  <AnimatedNumber v-if="isModern" :value="stats.total_api_keys" integer />
+                  <template v-else>{{ stats.total_api_keys }}</template>
                 </p>
                 <p class="text-xs text-green-600 dark:text-green-400">
                   {{ stats.active_api_keys }} {{ t('common.active') }}
@@ -40,7 +44,8 @@
                   {{ t('admin.dashboard.accounts') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  {{ stats.total_accounts }}
+                  <AnimatedNumber v-if="isModern" :value="stats.total_accounts" integer />
+                  <template v-else>{{ stats.total_accounts }}</template>
                 </p>
                 <p class="text-xs">
                   <span class="text-green-600 dark:text-green-400"
@@ -65,7 +70,8 @@
                   {{ t('admin.dashboard.todayRequests') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  {{ stats.today_requests }}
+                  <AnimatedNumber v-if="isModern" :value="stats.today_requests" integer />
+                  <template v-else>{{ stats.today_requests }}</template>
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                   {{ t('common.total') }}: {{ formatNumber(stats.total_requests) }}
@@ -85,7 +91,8 @@
                   {{ t('admin.dashboard.users') }}
                 </p>
                 <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                  +{{ stats.today_new_users }}
+                  +<AnimatedNumber v-if="isModern" :value="stats.today_new_users" integer />
+                  <template v-else>{{ stats.today_new_users }}</template>
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                   {{ t('common.total') }}: {{ formatNumber(stats.total_users) }}
@@ -96,7 +103,7 @@
         </div>
 
         <!-- Row 2: Token Stats -->
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="admin-metric-grid grid grid-cols-2 gap-4 lg:grid-cols-4">
           <!-- Today Tokens -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
@@ -108,7 +115,8 @@
                   {{ t('admin.dashboard.todayTokens') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  {{ formatTokens(stats.today_tokens) }}
+                  <AnimatedNumber v-if="isModern" :value="stats.today_tokens" :formatter="formatTokens" integer />
+                  <template v-else>{{ formatTokens(stats.today_tokens) }}</template>
                 </p>
                 <p class="text-xs">
                   <span
@@ -144,7 +152,8 @@
                   {{ t('admin.dashboard.totalTokens') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  {{ formatTokens(stats.total_tokens) }}
+                  <AnimatedNumber v-if="isModern" :value="stats.total_tokens" :formatter="formatTokens" integer />
+                  <template v-else>{{ formatTokens(stats.total_tokens) }}</template>
                 </p>
                 <p class="text-xs">
                   <span
@@ -181,13 +190,15 @@
                 </p>
                 <div class="flex items-baseline gap-2">
                   <p class="text-xl font-bold text-gray-900 dark:text-white">
-                    {{ formatTokens(stats.rpm) }}
+                    <AnimatedNumber v-if="isModern" :value="stats.rpm" :formatter="formatTokens" integer />
+                    <template v-else>{{ formatTokens(stats.rpm) }}</template>
                   </p>
                   <span class="text-xs text-gray-500 dark:text-gray-400">RPM</span>
                 </div>
                 <div class="flex items-baseline gap-2">
                   <p class="text-sm font-semibold text-violet-600 dark:text-violet-400">
-                    {{ formatTokens(stats.tpm) }}
+                    <AnimatedNumber v-if="isModern" :value="stats.tpm" :formatter="formatTokens" integer />
+                    <template v-else>{{ formatTokens(stats.tpm) }}</template>
                   </p>
                   <span class="text-xs text-gray-500 dark:text-gray-400">TPM</span>
                 </div>
@@ -206,7 +217,8 @@
                   {{ t('admin.dashboard.avgResponse') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  {{ formatDuration(stats.average_duration_ms) }}
+                  <AnimatedNumber v-if="isModern" :value="stats.average_duration_ms" :formatter="formatDuration" integer />
+                  <template v-else>{{ formatDuration(stats.average_duration_ms) }}</template>
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                   {{ stats.active_users }} {{ t('admin.dashboard.activeUsers') }}
@@ -217,7 +229,7 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="card p-4">
+        <div class="admin-quick-actions card p-4">
           <div class="mb-3 flex items-center justify-between">
             <h2 class="text-sm font-semibold text-gray-900 dark:text-white">
               {{ t('admin.dashboard.quickActions') }}
@@ -352,6 +364,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
+import { useAppearance } from '@/composables/useAppearance'
+import AnimatedNumber from '@/components/custom/AnimatedNumber.vue'
+import AdminDashboardOverview from '@/components/custom/AdminDashboardOverview.vue'
+import LoadingPlaceholder from '@/components/custom/LoadingPlaceholder.vue'
+import RefreshIndicator from '@/components/custom/RefreshIndicator.vue'
 
 const { t } = useI18n()
 import { adminAPI } from '@/api/admin'
@@ -395,6 +413,8 @@ ChartJS.register(
 )
 
 const appStore = useAppStore()
+const authStore = useAuthStore()
+const { isModern } = useAppearance()
 const router = useRouter()
 const { canUseBatchImage, refreshBatchImageAccess } = useBatchImageAccess()
 const stats = ref<DashboardStats | null>(null)
@@ -403,6 +423,7 @@ const chartsLoading = ref(false)
 const userTrendLoading = ref(false)
 const rankingLoading = ref(false)
 const rankingError = ref(false)
+const dashboardBusy = computed(() => loading.value || chartsLoading.value || userTrendLoading.value || rankingLoading.value)
 
 // Chart data
 const trendData = ref<TrendDataPoint[]>([])
