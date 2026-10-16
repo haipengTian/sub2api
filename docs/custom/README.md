@@ -5,8 +5,8 @@
 
 ## 当前基线
 
-个人 `v0.2.15-custom.1` 已发布，镜像为 `ghcr.io/haipengtian/sub2api:0.2.15-custom.1`。
-该版本基于当时选定的官方 main 快照；后续以明确的官方稳定 tag 为融合目标，不以仓库当前分支名代替发布记录。
+个人 `v0.2.16-custom.3` 已发布，镜像为 `ghcr.io/haipengtian/sub2api:0.2.16-custom.3`。
+该版本沿用 `v0.2.16-custom.2` 的官方融合基线，新增 Credit 风格；发布验证和服务器更新命令见 [版本记录](releases/0.2.16-custom.3.md)。后续以明确的官方稳定 tag 为融合目标，不以仓库当前分支名代替发布记录。
 官方远程为 `upstream`，个人远程为 `origin`。
 
 新增自动融合流程见 [自动融合上游与二开发布](auto-updates.md)：定时获取官方稳定版，
