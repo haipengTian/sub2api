@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="mx-auto max-w-6xl space-y-6">
+    <div class="settings-page mx-auto max-w-6xl space-y-6">
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
         <div
@@ -45,11 +45,11 @@
         </div>
 
         <!-- Tab: Security — Admin API Key -->
-        <div v-show="activeTab === 'security'" class="space-y-6">
+        <div v-show="activeTab === 'security'" class="settings-section space-y-6">
           <!-- Admin API Key Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.adminApiKey.title") }}
@@ -58,7 +58,7 @@
                 {{ t("admin.settings.adminApiKey.description") }}
               </p>
             </div>
-            <div class="space-y-4 p-6">
+            <div class="settings-card-body space-y-4 p-6">
               <!-- Security Warning -->
               <div
                 class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
@@ -89,7 +89,7 @@
               <!-- No Key Configured -->
               <div
                 v-else-if="!adminApiKeyExists"
-                class="flex items-center justify-between"
+                class="settings-toggle-row flex items-center justify-between"
               >
                 <span class="text-gray-500 dark:text-gray-400">
                   {{ t("admin.settings.adminApiKey.notConfigured") }}
@@ -202,11 +202,11 @@
         <!-- /Tab: Security — Admin API Key -->
 
         <!-- Tab: Gateway -->
-        <div v-show="activeTab === 'gateway'" class="space-y-6">
+        <div v-show="activeTab === 'gateway'" class="settings-section space-y-6">
           <!-- Overload Cooldown (529) Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.overloadCooldown.title") }}
@@ -215,7 +215,7 @@
                 {{ t("admin.settings.overloadCooldown.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <div
                 v-if="overloadCooldownLoading"
                 class="flex items-center gap-2 text-gray-500"
@@ -305,9 +305,9 @@
           </div>
 
           <!-- Rate Limit Cooldown (429) Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.rateLimit429Cooldown.title") }}
@@ -316,7 +316,7 @@
                 {{ t("admin.settings.rateLimit429Cooldown.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <div
                 v-if="rateLimit429CooldownLoading"
                 class="flex items-center gap-2 text-gray-500"
@@ -412,9 +412,9 @@
           </div>
 
           <!-- Stream Timeout Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.streamTimeout.title") }}
@@ -423,7 +423,7 @@
                 {{ t("admin.settings.streamTimeout.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <!-- Loading State -->
               <div
                 v-if="streamTimeoutLoading"
@@ -592,9 +592,9 @@
           </div>
 
           <!-- Request Rectifier Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.rectifier.title") }}
@@ -603,7 +603,7 @@
                 {{ t("admin.settings.rectifier.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <!-- Loading State -->
               <div
                 v-if="rectifierLoading"
@@ -791,9 +791,9 @@
             </div>
           </div>
           <!-- Beta Policy Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.betaPolicy.title") }}
@@ -802,7 +802,7 @@
                 {{ t("admin.settings.betaPolicy.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <!-- Loading State -->
               <div
                 v-if="betaPolicyLoading"
@@ -1070,9 +1070,9 @@
             </div>
           </div>
           <!-- OpenAI Fast/Flex Policy Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.openaiFastPolicy.title") }}
@@ -1081,7 +1081,7 @@
                 {{ t("admin.settings.openaiFastPolicy.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <!-- Empty state -->
               <div
                 v-if="openaiFastPolicyForm.rules.length === 0"
@@ -1422,11 +1422,11 @@
         <!-- /Tab: Gateway -->
 
         <!-- Tab: Security — Registration, Turnstile, LinuxDo -->
-        <div v-show="activeTab === 'security'" class="space-y-6">
+        <div v-show="activeTab === 'security'" class="settings-section space-y-6">
           <!-- Registration Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.registration.title") }}
@@ -1435,9 +1435,9 @@
                 {{ t("admin.settings.registration.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <!-- Enable Registration -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.registration.enableRegistration")
@@ -1453,7 +1453,7 @@
 
               <!-- Email Verification -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1537,7 +1537,7 @@
 
               <!-- Email Domain Quota -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1554,7 +1554,7 @@
 
               <!-- Promo Code -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1569,7 +1569,7 @@
 
               <!-- Invitation Code -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1584,7 +1584,7 @@
               <!-- Password Reset - Only show when email verification is enabled -->
               <div
                 v-if="form.email_verify_enabled"
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1621,7 +1621,7 @@
 
               <!-- TOTP 2FA -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1705,7 +1705,7 @@
 
               <!-- 敏感操作 step-up 2FA -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1720,7 +1720,7 @@
 
               <!-- 会话 IP/UA 绑定 -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1735,7 +1735,7 @@
 
               <!-- 审计日志保留天数 -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -1756,9 +1756,9 @@
           </div>
 
           <!-- API Key IP ACL Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.apiKeyAcl.title") }}
@@ -1767,8 +1767,8 @@
                 {{ t("admin.settings.apiKeyAcl.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between gap-4">
+            <div class="settings-card-body space-y-5 p-6">
+              <div class="settings-toggle-row flex items-center justify-between gap-4">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">
                     {{ t("admin.settings.apiKeyAcl.trustForwardedIp") }}
@@ -1843,9 +1843,9 @@
           </div>
 
           <!-- Panel API Rate Limit Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <div class="flex items-center gap-2">
                 <Icon
@@ -1861,7 +1861,7 @@
                 {{ t("admin.settings.panelRateLimit.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <div
                 v-if="panelRateLimitLoading"
                 class="flex items-center gap-2 text-gray-500"
@@ -2034,9 +2034,9 @@
           </div>
 
           <!-- 人机验证 Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.captcha.title") }}
@@ -2045,9 +2045,9 @@
                 {{ t("admin.settings.captcha.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <!-- Enable Captcha -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.captcha.enable")
@@ -2438,9 +2438,9 @@
           </div>
 
           <!-- LinuxDo Connect OAuth 登录 -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.linuxdo.title") }}
@@ -2449,8 +2449,8 @@
                 {{ t("admin.settings.linuxdo.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
+            <div class="settings-card-body space-y-5 p-6">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.linuxdo.enable")
@@ -2556,9 +2556,9 @@
           </div>
 
           <!-- GitHub / Google 邮箱快捷登录 -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ localText("邮箱快捷登录", "Email OAuth Sign-in") }}
@@ -2572,7 +2572,7 @@
                 }}
               </p>
             </div>
-            <div class="space-y-6 p-6">
+            <div class="settings-card-body space-y-6 p-6">
               <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-700">
                   <div class="flex items-start justify-between gap-4">
@@ -2782,9 +2782,9 @@
           </div>
 
           <!-- WeChat Connect OAuth 登录 -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.wechatConnect.title") }}
@@ -2793,8 +2793,8 @@
                 {{ t("admin.settings.wechatConnect.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
+            <div class="settings-card-body space-y-5 p-6">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.wechatConnect.enabledLabel")
@@ -3124,9 +3124,9 @@
           </div>
 
           <!-- DingTalk Connect OAuth 登录 -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.dingtalk.title") }}
@@ -3135,8 +3135,8 @@
                 {{ t("admin.settings.dingtalk.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
+            <div class="settings-card-body space-y-5 p-6">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.dingtalk.enable")
@@ -3412,9 +3412,9 @@
           </div>
 
           <!-- Generic OIDC OAuth 登录 -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.oidc.title") }}
@@ -3423,8 +3423,8 @@
                 {{ t("admin.settings.oidc.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
+            <div class="settings-card-body space-y-5 p-6">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.oidc.enable")
@@ -3823,11 +3823,11 @@
         <!-- /Tab: Security — Registration, Turnstile, LinuxDo, OIDC -->
 
         <!-- Tab: Users -->
-        <div v-show="activeTab === 'users'" class="space-y-6">
+        <div v-show="activeTab === 'users'" class="settings-section space-y-6">
           <!-- Default Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.defaults.title") }}
@@ -3836,7 +3836,7 @@
                 {{ t("admin.settings.defaults.description") }}
               </p>
             </div>
-            <div class="space-y-6 p-6">
+            <div class="settings-card-body space-y-6 p-6">
               <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                   <label
@@ -4098,9 +4098,9 @@
             </div>
           </div>
 
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.authSourceDefaults.title") }}
@@ -4109,9 +4109,9 @@
                 {{ t("admin.settings.authSourceDefaults.description") }}
               </p>
             </div>
-            <div class="space-y-6 p-6">
+            <div class="settings-card-body space-y-6 p-6">
               <div
-                class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">
@@ -4439,11 +4439,11 @@
         <!-- /Tab: Users -->
 
         <!-- Tab: Gateway — Claude Code, Scheduling -->
-        <div v-show="activeTab === 'gateway'" class="space-y-6">
+        <div v-show="activeTab === 'gateway'" class="settings-section space-y-6">
           <!-- Claude Code Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.claudeCode.title") }}
@@ -4452,7 +4452,7 @@
                 {{ t("admin.settings.claudeCode.description") }}
               </p>
             </div>
-            <div class="p-6">
+            <div class="settings-card-body p-6">
               <div>
                 <label
                   class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -4493,15 +4493,15 @@
           </div>
 
           <!-- Codex Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.gatewayForwarding.codexHardeningTitle") }}
               </h2>
             </div>
-            <div class="p-6 space-y-4">
+            <div class="settings-card-body p-6 space-y-4">
                 <div>
                   <h3 class="text-base font-semibold text-gray-900 dark:text-white">
                     {{ t("admin.settings.gatewayForwarding.codexClientRestrictionTitle") }}
@@ -4596,7 +4596,7 @@
                   </p>
                 </div>
 
-                <div class="flex items-center justify-between">
+                <div class="settings-toggle-row flex items-center justify-between">
                   <div class="pr-4">
                     <label
                       class="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -4741,9 +4741,9 @@
           </div>
 
           <!-- Upstream Billing Probe Settings -->
-          <div class="card" data-testid="upstream-billing-probe-settings">
+          <div class="settings-card card" data-testid="upstream-billing-probe-settings">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.upstreamBillingProbe.title") }}
@@ -4752,7 +4752,7 @@
                 {{ t("admin.settings.upstreamBillingProbe.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <div
                 v-if="upstreamBillingProbeLoading"
                 class="flex items-center gap-2 text-gray-500"
@@ -4827,8 +4827,8 @@
           </div>
 
           <!-- Ollama Cloud Usage Settings -->
-          <div class="card" data-testid="ollama-cloud-usage-global-settings">
-            <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+          <div class="settings-card card" data-testid="ollama-cloud-usage-global-settings">
+            <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.ollamaCloudUsage.title") }}
               </h2>
@@ -4836,7 +4836,7 @@
                 {{ t("admin.settings.ollamaCloudUsage.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <div v-if="ollamaCloudUsageLoading" class="flex items-center gap-2 text-gray-500">
                 <div class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary-600"></div>
                 {{ t("common.loading") }}
@@ -4911,8 +4911,8 @@
           </div>
 
           <!-- OpenCode Go Usage Settings -->
-          <div class="card" data-testid="opencode-go-usage-global-settings">
-            <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+          <div class="settings-card card" data-testid="opencode-go-usage-global-settings">
+            <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.opencodeGoUsage.title") }}
               </h2>
@@ -4920,7 +4920,7 @@
                 {{ t("admin.settings.opencodeGoUsage.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <div v-if="opencodeGoUsageLoading" class="flex items-center gap-2 text-gray-500">
                 <div class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary-600"></div>
                 {{ t("common.loading") }}
@@ -4995,9 +4995,9 @@
           </div>
 
           <!-- Gateway Scheduling Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.scheduling.title") }}
@@ -5006,8 +5006,8 @@
                 {{ t("admin.settings.scheduling.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
+            <div class="settings-card-body space-y-5 p-6">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5095,7 +5095,7 @@
 
               <div
                 v-if="!form.openai_advanced_scheduler_enabled"
-                class="flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700"
               >
                 <div>
                   <label
@@ -5146,7 +5146,7 @@
                 </div>
               </div>
 
-              <div class="flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700">
+              <div class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5167,7 +5167,7 @@
 
               <div
                 v-if="form.openai_advanced_scheduler_enabled"
-                class="flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700"
               >
                 <div>
                   <label
@@ -5186,7 +5186,7 @@
 
               <div
                 v-if="form.openai_advanced_scheduler_enabled"
-                class="flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-5 dark:border-dark-700"
               >
                 <div>
                   <label
@@ -5274,9 +5274,9 @@
           </div>
 
           <!-- Gateway Forwarding Behavior -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.gatewayForwarding.title") }}
@@ -5285,7 +5285,7 @@
                 {{ t("admin.settings.gatewayForwarding.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <div class="grid gap-5 border-b border-gray-100 pb-5 dark:border-dark-700 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
                 <div>
                   <label
@@ -5378,7 +5378,7 @@
               </div>
 
               <!-- Fingerprint Unification -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5401,7 +5401,7 @@
               </div>
 
               <!-- Metadata Passthrough -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5422,7 +5422,7 @@
               </div>
 
               <!-- CCH Signing -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5437,7 +5437,7 @@
               </div>
 
               <!-- Claude OAuth System Prompt Injection -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5668,7 +5668,7 @@
               </div>
 
               <!-- Anthropic Cache TTL 1h Injection -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5693,7 +5693,7 @@
               </div>
 
               <!-- messages cache_control 改写 -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5716,7 +5716,7 @@
               </div>
 
               <!-- 客户端 dateline 归一化（仅 Anthropic OAuth/SetupToken） -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5831,7 +5831,7 @@
               </div>
 
               <!-- Codex 版本号自动同步 -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5886,7 +5886,7 @@
               </div>
 
               <!-- Claude Code 版本号自动同步 -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -5918,9 +5918,9 @@
           </div>
 
           <!-- Web Search Emulation -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.webSearchEmulation.title") }}
@@ -5929,9 +5929,9 @@
                 {{ t("admin.settings.webSearchEmulation.description") }}
               </p>
             </div>
-            <div class="space-y-5 p-6">
+            <div class="settings-card-body space-y-5 p-6">
               <!-- Global Toggle -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label
                     class="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -6354,8 +6354,8 @@
           </div>
 
         <!-- Usage Records Settings -->
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.usageRecords.title') }}
             </h2>
@@ -6363,9 +6363,9 @@
               {{ t('admin.settings.usageRecords.description') }}
             </p>
           </div>
-          <div class="space-y-4 p-6">
+          <div class="settings-card-body space-y-4 p-6">
             <!-- User error requests visibility -->
-            <div class="flex items-center justify-between">
+            <div class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.user_error_view.label') }}
@@ -6385,11 +6385,11 @@
         <!-- /Tab: Gateway — Claude Code, Scheduling -->
 
         <!-- Tab: General -->
-        <div v-show="activeTab === 'general'" class="space-y-6">
+        <div v-show="activeTab === 'general'" class="settings-section space-y-6">
           <!-- Site Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.site.title") }}
@@ -6398,10 +6398,10 @@
                 {{ t("admin.settings.site.description") }}
               </p>
             </div>
-            <div class="space-y-6 p-6">
+            <div class="settings-card-body space-y-6 p-6">
               <!-- Backend Mode -->
               <div
-                class="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+                class="settings-toggle-row flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
               >
                 <div>
                   <h3 class="text-sm font-medium text-gray-900 dark:text-white">
@@ -6724,7 +6724,7 @@
               </div>
 
               <!-- Compact Home Page -->
-              <div class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700">
+              <div class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.site.compactHome")
@@ -6738,7 +6738,7 @@
 
               <!-- Hide CCS Import Button -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -6754,9 +6754,9 @@
           </div>
 
           <!-- Custom Menu Items -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.customMenu.title") }}
@@ -6765,7 +6765,7 @@
                 {{ t("admin.settings.customMenu.description") }}
               </p>
             </div>
-            <div class="space-y-4 p-6">
+            <div class="settings-card-body space-y-4 p-6">
               <!-- Existing menu items -->
               <div
                 v-for="(item, index) in form.custom_menu_items"
@@ -6958,9 +6958,9 @@
 	        <!-- /Tab: General -->
 
 	        <!-- Tab: Login Agreement -->
-	        <div v-show="activeTab === 'agreement'" class="space-y-6">
-	          <div class="card">
-	            <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+	        <div v-show="activeTab === 'agreement'" class="settings-section space-y-6">
+	          <div class="settings-card card">
+	            <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
 	              <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 	                <div>
 	                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -6984,7 +6984,7 @@
 	              </div>
 	            </div>
 
-	            <div class="space-y-6 p-6">
+	            <div class="settings-card-body space-y-6 p-6">
 	              <div class="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_220px]">
 	                <div>
 	                  <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -7160,10 +7160,10 @@
         <!-- /Tab: Login Agreement -->
 
 	        <!-- Tab: Features (功能开关) -->
-        <div v-show="activeTab === 'features'" class="space-y-6">
+        <div v-show="activeTab === 'features'" class="settings-section space-y-6">
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.features.channelMonitor.title') }}
             </h2>
@@ -7180,8 +7180,8 @@
               </router-link>
             </p>
           </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
+          <div class="settings-card-body space-y-5 p-6">
+            <div class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.channelMonitor.enabled') }}
@@ -7293,8 +7293,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.features.availableChannels.title') }}
             </h2>
@@ -7311,8 +7311,8 @@
               </router-link>
             </p>
           </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
+          <div class="settings-card-body space-y-5 p-6">
+            <div class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.availableChannels.enabled') }}
@@ -7326,8 +7326,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.features.modelPlaza.title') }}
             </h2>
@@ -7335,8 +7335,8 @@
               {{ t('admin.settings.features.modelPlaza.description') }}
             </p>
           </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
+          <div class="settings-card-body space-y-5 p-6">
+            <div class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.modelPlaza.enabled') }}
@@ -7348,7 +7348,7 @@
               <Toggle v-model="form.model_plaza_enabled" />
             </div>
 
-            <div v-if="form.model_plaza_enabled" class="flex items-center justify-between">
+            <div v-if="form.model_plaza_enabled" class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.modelPlaza.requireAuth') }}
@@ -7376,8 +7376,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.features.siteBillingMode.title') }}
             </h2>
@@ -7385,7 +7385,7 @@
               {{ t('admin.settings.features.siteBillingMode.description') }}
             </p>
           </div>
-          <div class="space-y-5 p-6">
+          <div class="settings-card-body space-y-5 p-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div class="min-w-0">
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -7406,8 +7406,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.features.pluginManagement.title') }}
             </h2>
@@ -7415,8 +7415,8 @@
               {{ t('admin.settings.features.pluginManagement.description') }}
             </p>
           </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between gap-4">
+          <div class="settings-card-body space-y-5 p-6">
+            <div class="settings-toggle-row flex items-center justify-between gap-4">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.pluginManagement.enabled') }}
@@ -7430,8 +7430,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.features.riskControl.title') }}
             </h2>
@@ -7448,8 +7448,8 @@
               </router-link>
             </p>
           </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
+          <div class="settings-card-body space-y-5 p-6">
+            <div class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.riskControl.enabled') }}
@@ -7473,7 +7473,7 @@
               </p>
             </div>
 
-            <div class="flex items-center justify-between">
+            <div class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.riskControl.cyberSessionBlock') }}
@@ -7501,8 +7501,8 @@
         </div>
 
         <!-- Affiliate (邀请返利) feature card -->
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+        <div class="settings-card card">
+          <div class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('admin.settings.features.affiliate.title') }}
             </h2>
@@ -7510,8 +7510,8 @@
               {{ t('admin.settings.features.affiliate.description') }}
             </p>
           </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
+          <div class="settings-card-body space-y-5 p-6">
+            <div class="settings-toggle-row flex items-center justify-between">
               <div>
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.settings.features.affiliate.enabled') }}
@@ -7916,11 +7916,11 @@
 
         <!-- Tab: Email -->
         <!-- Tab: Payment -->
-        <div v-show="activeTab === 'payment'" class="space-y-6">
+        <div v-show="activeTab === 'payment'" class="settings-section space-y-6">
           <!-- Payment System Settings -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.payment.title") }}
@@ -7950,9 +7950,9 @@
                 </a>
               </p>
             </div>
-            <div class="space-y-4 p-6">
+            <div class="settings-card-body space-y-4 p-6">
               <!-- Enable toggle -->
-              <div class="flex items-center justify-between">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
                     t("admin.settings.payment.enabled")
@@ -8218,7 +8218,7 @@
                     <label class="input-label">{{
                       t("admin.settings.payment.cancelRateLimit")
                     }}</label>
-                    <div class="flex items-center gap-2">
+                    <div class="settings-payment-rate-control flex items-center gap-2">
                       <button
                         type="button"
                         :class="[
@@ -8475,7 +8475,7 @@
           />
         </div>
 
-        <div v-show="activeTab === 'email'" class="space-y-6">
+        <div v-show="activeTab === 'email'" class="settings-section space-y-6">
           <!-- Email disabled hint - show when email_verify_enabled is off -->
           <div v-if="!form.email_verify_enabled" class="card">
             <div class="p-6">
@@ -8498,9 +8498,9 @@
           </div>
 
           <!-- SMTP Settings - Only show when email verification is enabled -->
-          <div v-if="form.email_verify_enabled" class="card">
+          <div v-if="form.email_verify_enabled" class="settings-card card">
             <div
-              class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <div>
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -8543,7 +8543,7 @@
                 }}
               </button>
             </div>
-            <div class="space-y-6 p-6">
+            <div class="settings-card-body space-y-6 p-6">
               <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                   <label
@@ -8645,7 +8645,7 @@
 
               <!-- Use TLS Toggle -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="settings-toggle-row flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
               >
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -8661,9 +8661,9 @@
           </div>
 
           <!-- Send Test Email - Only show when email verification is enabled -->
-          <div v-if="form.email_verify_enabled" class="card">
+          <div v-if="form.email_verify_enabled" class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ t("admin.settings.testEmail.title") }}
@@ -8672,7 +8672,7 @@
                 {{ t("admin.settings.testEmail.description") }}
               </p>
             </div>
-            <div class="p-6">
+            <div class="settings-card-body p-6">
               <div class="flex items-end gap-4">
                 <div class="flex-1">
                   <label
@@ -8728,9 +8728,9 @@
           </div>
 
           <!-- 订阅到期提醒 -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h3 class="text-base font-medium text-gray-900 dark:text-white">
                 {{ t("admin.settings.subscriptionExpiryNotify.title") }}
@@ -8739,8 +8739,8 @@
                 {{ t("admin.settings.subscriptionExpiryNotify.description") }}
               </p>
             </div>
-            <div class="px-6 py-6">
-              <div class="flex items-center justify-between gap-4">
+            <div class="settings-card-body px-6 py-6">
+              <div class="settings-toggle-row flex items-center justify-between gap-4">
                 <div>
                   <label
                     class="mb-0 block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -8759,9 +8759,9 @@
           <EmailTemplateEditor />
 
           <!-- Balance Low Notification -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h3 class="text-base font-medium text-gray-900 dark:text-white">
                 {{ t("admin.settings.balanceNotify.title") }}
@@ -8770,8 +8770,8 @@
                 {{ t("admin.settings.balanceNotify.description") }}
               </p>
             </div>
-            <div class="px-6 py-6 space-y-4">
-              <div class="flex items-center justify-between">
+            <div class="settings-card-body px-6 py-6 space-y-4">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <label
                   class="mb-0 block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >{{ t("admin.settings.balanceNotify.enabled") }}</label
@@ -8819,9 +8819,9 @@
           </div>
 
           <!-- Account Quota Notification -->
-          <div class="card">
+          <div class="settings-card card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="settings-card-header border-b border-gray-100 px-6 py-4 dark:border-dark-700"
             >
               <h3 class="text-base font-medium text-gray-900 dark:text-white">
                 {{ t("admin.settings.quotaNotify.title") }}
@@ -8830,8 +8830,8 @@
                 {{ t("admin.settings.quotaNotify.description") }}
               </p>
             </div>
-            <div class="px-6 py-6 space-y-4">
-              <div class="flex items-center justify-between">
+            <div class="settings-card-body px-6 py-6 space-y-4">
+              <div class="settings-toggle-row flex items-center justify-between">
                 <label
                   class="mb-0 block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >{{ t("admin.settings.quotaNotify.enabled") }}</label
@@ -8902,7 +8902,7 @@
         </div>
 
         <!-- Save Button -->
-        <div v-show="activeTab !== 'backup'" class="flex justify-end">
+        <div v-show="activeTab !== 'backup'" class="settings-save-bar flex justify-end">
           <button
             type="submit"
             :disabled="saving || loadFailed"

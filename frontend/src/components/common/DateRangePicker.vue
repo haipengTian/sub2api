@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" ref="containerRef">
+  <div class="relative" ref="containerRef" :style="{ '--date-picker-anchor-left': `${anchorLeft}px` }">
     <button
       type="button"
       @click="toggle"
@@ -104,6 +104,10 @@ const { t, locale } = useI18n()
 
 const isOpen = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
+const anchorLeft = ref(0)
+const updateAnchor = () => {
+  if (isOpen.value && containerRef.value) anchorLeft.value = containerRef.value.getBoundingClientRect().left
+}
 const localStartDate = ref(props.startDate)
 const localEndDate = ref(props.endDate)
 const activePreset = ref<string | null>('last24Hours')
@@ -285,7 +289,7 @@ const handleEscape = (event: KeyboardEvent) => {
 
 // Restore the applied range after dismissal, including parent updates from Apply.
 watch(isOpen, (open) => {
-  if (open) return
+  if (open) { updateAnchor(); return }
   localStartDate.value = props.startDate
   localEndDate.value = props.endDate
   onDateChange()
@@ -311,6 +315,7 @@ watch(
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('keydown', handleEscape)
+  window.addEventListener('resize', updateAnchor)
   // Initialize active preset detection
   onDateChange()
 })
@@ -318,6 +323,7 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
   document.removeEventListener('keydown', handleEscape)
+  window.removeEventListener('resize', updateAnchor)
 })
 </script>
 

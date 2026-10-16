@@ -138,6 +138,7 @@
 
           <template #cell-platform="{ value }">
             <span
+              class="ledger-platform-tag"
               :class="[
                 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
                 value === 'anthropic'
@@ -276,7 +277,7 @@
           </template>
 
           <template #cell-account_count="{ row }">
-            <div class="space-y-0.5 text-xs">
+            <div class="ledger-metrics space-y-0.5 text-xs">
               <div>
                 <span class="text-gray-500 dark:text-gray-400">{{
                   t("admin.groups.accountsAvailable")
@@ -321,6 +322,7 @@
 
           <template #cell-capacity="{ row }">
             <GroupCapacityBadge
+              class="ledger-capacity"
               v-if="capacityMap.get(row.id)"
               :concurrency-used="capacityMap.get(row.id)!.concurrencyUsed"
               :concurrency-max="capacityMap.get(row.id)!.concurrencyMax"
@@ -334,7 +336,7 @@
 
           <template #cell-usage="{ row }">
             <div v-if="usageLoading" class="text-xs text-gray-400">—</div>
-            <div v-else class="space-y-0.5 text-xs">
+            <div v-else class="ledger-metrics space-y-0.5 text-xs">
               <div class="text-gray-500 dark:text-gray-400">
                 <span class="text-gray-400 dark:text-gray-500">{{
                   t("admin.groups.usageToday")
@@ -380,9 +382,10 @@
           </template>
 
           <template #cell-actions="{ row }">
-            <div class="flex items-center gap-1">
+            <div class="ledger-row-actions flex items-center gap-1">
               <button
                 @click="handleEdit(row)"
+                :title="t('common.edit')"
                 class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-dark-700 dark:hover:text-primary-400"
               >
                 <Icon name="edit" size="sm" />
@@ -412,6 +415,7 @@
               <button
                 v-if="!authStore.isSimpleMode && row.platform === 'composite'"
                 data-testid="group-composite-routes"
+                :title="t('admin.groups.compositeRoutes.action')"
                 @click="handleCompositeRoutes(row)"
                 class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-cyan-600 dark:hover:bg-dark-700 dark:hover:text-cyan-400"
               >
@@ -423,6 +427,7 @@
               <button
                 v-if="!authStore.isSimpleMode"
                 data-testid="group-rate-multipliers"
+                :title="t('admin.groups.rateMultipliers')"
                 @click="handleRateMultipliers(row)"
                 class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-purple-600 dark:hover:bg-dark-700 dark:hover:text-purple-400"
               >
@@ -434,6 +439,7 @@
               <button
                 v-if="!authStore.isSimpleMode"
                 data-testid="group-rpm-overrides"
+                :title="t('admin.groups.rpmOverrides')"
                 @click="handleRPMOverrides(row)"
                 class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-orange-600 dark:hover:bg-dark-700 dark:hover:text-orange-400"
               >
@@ -444,6 +450,7 @@
               </button>
               <button
                 @click="handleDelete(row)"
+                :title="t('common.delete')"
                 class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
               >
                 <Icon name="trash" size="sm" />

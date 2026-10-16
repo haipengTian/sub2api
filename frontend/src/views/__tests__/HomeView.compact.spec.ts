@@ -1,7 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { mount, RouterLinkStub } from '@vue/test-utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { enableAutoUnmount, mount, RouterLinkStub } from '@vue/test-utils'
 
 import HomeView from '../HomeView.vue'
+import { useAppearance } from '@/composables/useAppearance'
+
+enableAutoUnmount(afterEach)
 
 const { appStore, authStore } = vi.hoisted(() => ({
   appStore: {
@@ -74,6 +77,7 @@ describe('HomeView compact mode', () => {
     authStore.checkAuth.mockClear()
     appStore.fetchPublicSettings.mockClear()
     localStorage.clear()
+    useAppearance().setSkin('modern')
     vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: false } as MediaQueryList)
   })
 
@@ -180,5 +184,51 @@ describe('HomeView compact mode', () => {
     })
 
     expect(modelPlazaDestination(wrapper)).toBeUndefined()
+  })
+
+  it.each([
+    [false, false, '/login'],
+    [true, false, '/dashboard'],
+    [true, true, '/admin/dashboard'],
+  ])('routes the Credit primary action for authenticated=%s, admin=%s', (authenticated, admin, destination) => {
+    useAppearance().setSkin('credit')
+    authStore.isAuthenticated = authenticated
+    authStore.isAdmin = admin
+    const wrapper = mountHome()
+    expect(wrapper.get('[data-testid="credit-home"]').text()).toContain('Test subtitle')
+    const primary = wrapper.findAllComponents(RouterLinkStub).find(link => link.attributes('data-testid') === 'credit-start')
+    expect(primary?.props('to')).toBe(destination)
+    expect(wrapper.find('.terminal-container').exists()).toBe(false)
+  })
+
+  it('keeps the Credit headline concise and preserves the configured subtitle in the introduction', () => {
+    useAppearance().setSkin('credit')
+    const wrapper = mountHome({ site_subtitle: 'Custom gateway introduction' })
+    expect(wrapper.get('#credit-home-title').text()).toContain('appearance.homeHeadline')
+    expect(wrapper.get('#credit-home-title').text()).not.toContain('Custom gateway introduction')
+    expect(wrapper.get('.credit-home-description').text()).toContain('Custom gateway introduction')
+    expect(wrapper.get('.credit-home-card-bottom').text()).toContain('appearance.homeTokenTotal')
+    expect(wrapper.get('.credit-home-floating-card').text()).toContain('Token')
+  })
+
+  it('keeps custom and compact home settings ahead of the Credit landing', () => {
+    useAppearance().setSkin('credit')
+    const custom = mountHome({ home_content: '<section id="configured-home">Configured</section>' })
+    expect(custom.find('#configured-home').exists()).toBe(true)
+    expect(custom.find('[data-testid="credit-home"]').exists()).toBe(false)
+    const compact = mountHome({ compact_home_enabled: true })
+    expect(compact.find('[data-testid="compact-home"]').exists()).toBe(true)
+    expect(compact.find('[data-testid="credit-home"]').exists()).toBe(false)
+  })
+
+  it('respects model plaza access and sanitized docs in the Credit landing', () => {
+    useAppearance().setSkin('credit')
+    const wrapper = mountHome({ model_plaza_enabled: true, model_plaza_require_auth: true, doc_url: 'https://example.test/docs' })
+    expect(wrapper.find('[data-testid="credit-home"]').exists()).toBe(true)
+    expect(modelPlazaDestination(wrapper)).toBeUndefined()
+    expect(wrapper.get('a[href="https://example.test/docs"]').attributes('rel')).toContain('noopener')
+    const publicHome = mountHome({ model_plaza_enabled: true, model_plaza_require_auth: false, doc_url: 'javascript:alert(1)' })
+    expect(modelPlazaDestination(publicHome)).toBe('/model-plaza')
+    expect(publicHome.find('a[href^="javascript:"]').exists()).toBe(false)
   })
 })

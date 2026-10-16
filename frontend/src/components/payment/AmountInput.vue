@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-4">
+  <div class="payment-amount-input space-y-4">
     <!-- Quick Amount Buttons -->
     <div>
       <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -10,6 +10,7 @@
           v-for="amt in filteredAmounts"
           :key="amt"
           type="button"
+          :aria-pressed="modelValue === amt"
           :class="[
             'relative rounded-lg border-2 px-3 py-3 text-center font-medium transition-colors',
             modelValue === amt

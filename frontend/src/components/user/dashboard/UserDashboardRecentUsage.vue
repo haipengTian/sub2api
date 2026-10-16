@@ -6,7 +6,7 @@
       <span class="badge badge-gray">{{ t('dashboard.last7Days') }}</span>
     </div>
     <div class="p-6">
-      <LoadingPlaceholder v-if="showPlaceholder && isModern" kind="list" />
+      <LoadingPlaceholder v-if="showPlaceholder && isEnhanced" kind="list" />
       <div v-else-if="showPlaceholder" class="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
       </div>
@@ -58,7 +58,7 @@ const props = defineProps<{
   loading: boolean
   resolved?: boolean
 }>()
-const { isModern, showPlaceholder } = useLoadingPresentation(() => props.loading, () => props.data.length > 0, () => !!props.resolved)
+const { isEnhanced, showPlaceholder } = useLoadingPresentation(() => props.loading, () => props.data.length > 0, () => !!props.resolved)
 const { t } = useI18n()
 const formatCost = (c: number) => c.toFixed(4)
 </script>

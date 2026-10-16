@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="monitor-content" :class="{ 'monitor-content-empty': !loading && items.length === 0 }" :aria-busy="loading">
     <div
       v-if="loading && items.length === 0"
       class="monitor-card-grid grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"

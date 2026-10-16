@@ -90,6 +90,19 @@
     </footer>
   </div>
 
+  <CreditHome
+    v-else-if="isCredit"
+    :site-name="siteName"
+    :site-logo="siteLogo"
+    :site-subtitle="siteSubtitle"
+    :doc-url="docUrl"
+    :is-authenticated="isAuthenticated"
+    :dashboard-path="dashboardPath"
+    :show-model-plaza-entry="showModelPlazaEntry"
+    :is-dark="isDark"
+    @toggle-theme="toggleTheme"
+  />
+
   <!-- Default Home Page -->
   <div
     v-else
@@ -501,8 +514,11 @@ import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { sanitizeUrl } from '@/utils/url'
 import { FeatureFlags, isFeatureFlagEnabled } from '@/utils/featureFlags'
+import { useAppearance } from '@/composables/useAppearance'
+import CreditHome from '@/components/custom/CreditHome.vue'
 
 const { t } = useI18n()
+const { isCredit } = useAppearance()
 
 const authStore = useAuthStore()
 const appStore = useAppStore()

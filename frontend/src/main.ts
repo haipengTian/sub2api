@@ -8,6 +8,8 @@ import { updateFavicon } from '@/utils/branding'
 import { isIOSDevice } from '@/utils/device'
 import './style.css'
 import './styles/custom/modern.css'
+import './styles/custom/credit-fonts.css'
+import './styles/custom/credit.css'
 import { initAppearance } from '@/composables/useAppearance'
 
 function initIOSViewportZoomFix() {

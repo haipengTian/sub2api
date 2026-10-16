@@ -2,9 +2,9 @@
   <AppLayout>
     <div class="admin-dashboard relative space-y-6" :aria-busy="dashboardBusy">
       <RefreshIndicator :active="dashboardBusy" />
-      <AdminDashboardOverview v-if="isModern" :stats="stats" :simple-mode="authStore.isSimpleMode" />
+      <AdminDashboardOverview v-if="isEnhanced" :stats="stats" :simple-mode="authStore.isSimpleMode" />
       <!-- Loading State -->
-      <LoadingPlaceholder v-if="loading && isModern" kind="dashboard" />
+      <LoadingPlaceholder v-if="loading && isEnhanced" kind="dashboard" />
       <div v-else-if="loading" class="flex items-center justify-center py-12">
         <LoadingSpinner />
       </div>
@@ -23,7 +23,7 @@
                   {{ t('admin.dashboard.apiKeys') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  <AnimatedNumber v-if="isModern" :value="stats.total_api_keys" integer />
+                  <AnimatedNumber v-if="isEnhanced" :value="stats.total_api_keys" integer />
                   <template v-else>{{ stats.total_api_keys }}</template>
                 </p>
                 <p class="text-xs text-green-600 dark:text-green-400">
@@ -44,7 +44,7 @@
                   {{ t('admin.dashboard.accounts') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  <AnimatedNumber v-if="isModern" :value="stats.total_accounts" integer />
+                  <AnimatedNumber v-if="isEnhanced" :value="stats.total_accounts" integer />
                   <template v-else>{{ stats.total_accounts }}</template>
                 </p>
                 <p class="text-xs">
@@ -70,7 +70,7 @@
                   {{ t('admin.dashboard.todayRequests') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  <AnimatedNumber v-if="isModern" :value="stats.today_requests" integer />
+                  <AnimatedNumber v-if="isEnhanced" :value="stats.today_requests" integer />
                   <template v-else>{{ stats.today_requests }}</template>
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -91,7 +91,7 @@
                   {{ t('admin.dashboard.users') }}
                 </p>
                 <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                  +<AnimatedNumber v-if="isModern" :value="stats.today_new_users" integer />
+                  +<AnimatedNumber v-if="isEnhanced" :value="stats.today_new_users" integer />
                   <template v-else>{{ stats.today_new_users }}</template>
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -115,7 +115,7 @@
                   {{ t('admin.dashboard.todayTokens') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  <AnimatedNumber v-if="isModern" :value="stats.today_tokens" :formatter="formatTokens" integer />
+                  <AnimatedNumber v-if="isEnhanced" :value="stats.today_tokens" :formatter="formatTokens" integer />
                   <template v-else>{{ formatTokens(stats.today_tokens) }}</template>
                 </p>
                 <p class="text-xs">
@@ -152,7 +152,7 @@
                   {{ t('admin.dashboard.totalTokens') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  <AnimatedNumber v-if="isModern" :value="stats.total_tokens" :formatter="formatTokens" integer />
+                  <AnimatedNumber v-if="isEnhanced" :value="stats.total_tokens" :formatter="formatTokens" integer />
                   <template v-else>{{ formatTokens(stats.total_tokens) }}</template>
                 </p>
                 <p class="text-xs">
@@ -190,14 +190,14 @@
                 </p>
                 <div class="flex items-baseline gap-2">
                   <p class="text-xl font-bold text-gray-900 dark:text-white">
-                    <AnimatedNumber v-if="isModern" :value="stats.rpm" :formatter="formatTokens" integer />
+                    <AnimatedNumber v-if="isEnhanced" :value="stats.rpm" :formatter="formatTokens" integer />
                     <template v-else>{{ formatTokens(stats.rpm) }}</template>
                   </p>
                   <span class="text-xs text-gray-500 dark:text-gray-400">RPM</span>
                 </div>
                 <div class="flex items-baseline gap-2">
                   <p class="text-sm font-semibold text-violet-600 dark:text-violet-400">
-                    <AnimatedNumber v-if="isModern" :value="stats.tpm" :formatter="formatTokens" integer />
+                    <AnimatedNumber v-if="isEnhanced" :value="stats.tpm" :formatter="formatTokens" integer />
                     <template v-else>{{ formatTokens(stats.tpm) }}</template>
                   </p>
                   <span class="text-xs text-gray-500 dark:text-gray-400">TPM</span>
@@ -217,7 +217,7 @@
                   {{ t('admin.dashboard.avgResponse') }}
                 </p>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
-                  <AnimatedNumber v-if="isModern" :value="stats.average_duration_ms" :formatter="formatDuration" integer />
+                  <AnimatedNumber v-if="isEnhanced" :value="stats.average_duration_ms" :formatter="formatDuration" integer />
                   <template v-else>{{ formatDuration(stats.average_duration_ms) }}</template>
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -344,7 +344,7 @@
               <div v-if="userTrendLoading" class="flex h-full items-center justify-center">
                 <LoadingSpinner size="md" />
               </div>
-              <Line v-else-if="userTrendChartData" :data="userTrendChartData" :options="lineOptions" />
+              <Line :key="chartAppearanceKey" v-else-if="userTrendChartData" :data="themeData('line', userTrendChartData)" :options="themeOptions('line', lineOptions)" />
               <div
                 v-else
                 class="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400"
@@ -360,6 +360,7 @@
 </template>
 
 <script setup lang="ts">
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -402,6 +403,8 @@ import {
 import { Line } from 'vue-chartjs'
 
 // Register Chart.js components
+const { themeData, themeOptions, chartAppearanceKey } = useChartAppearance()
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -414,7 +417,7 @@ ChartJS.register(
 
 const appStore = useAppStore()
 const authStore = useAuthStore()
-const { isModern } = useAppearance()
+const { isEnhanced } = useAppearance()
 const router = useRouter()
 const { canUseBatchImage, refreshBatchImageAccess } = useBatchImageAccess()
 const stats = ref<DashboardStats | null>(null)

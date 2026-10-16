@@ -293,7 +293,7 @@
           <template #cell-email="{ value }">
             <div class="flex items-center gap-2">
               <div
-                class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30"
+                class="ledger-avatar flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30"
               >
                 <span class="text-sm font-medium text-primary-700 dark:text-primary-300">
                   {{ value.charAt(0).toUpperCase() }}
@@ -343,7 +343,7 @@
           </template>
 
           <template #cell-groups="{ row }">
-            <div v-if="allGroups.length > 0" class="flex flex-col gap-1">
+            <div v-if="allGroups.length > 0" class="ledger-group-summary flex flex-col gap-1">
               <!-- 专属分组行 -->
               <span
                 v-if="getUserGroups(row).exclusive.length > 0"
@@ -551,6 +551,7 @@
 
           <template #cell-usage="{ row }">
             <PlatformUsageBreakdown
+              class="ledger-usage"
               :today="usageStats[row.id]?.today_actual_cost ?? 0"
               :total="usageStats[row.id]?.total_actual_cost ?? 0"
               :by-platform="usageStats[row.id]?.by_platform"
@@ -558,19 +559,19 @@
           </template>
 
           <template #cell-usage_anthropic="{ row }">
-            <PlatformCostCell :usage="getPlatformUsage(row.id, 'anthropic')" />
+            <PlatformCostCell class="ledger-usage" :usage="getPlatformUsage(row.id, 'anthropic')" />
           </template>
 
           <template #cell-usage_openai="{ row }">
-            <PlatformCostCell :usage="getPlatformUsage(row.id, 'openai')" />
+            <PlatformCostCell class="ledger-usage" :usage="getPlatformUsage(row.id, 'openai')" />
           </template>
 
           <template #cell-usage_gemini="{ row }">
-            <PlatformCostCell :usage="getPlatformUsage(row.id, 'gemini')" />
+            <PlatformCostCell class="ledger-usage" :usage="getPlatformUsage(row.id, 'gemini')" />
           </template>
 
           <template #cell-usage_antigravity="{ row }">
-            <PlatformCostCell :usage="getPlatformUsage(row.id, 'antigravity')" />
+            <PlatformCostCell class="ledger-usage" :usage="getPlatformUsage(row.id, 'antigravity')" />
           </template>
 
           <template #cell-concurrency="{ row }">
@@ -611,10 +612,11 @@
           </template>
 
           <template #cell-actions="{ row }">
-            <div class="flex items-center gap-1">
+            <div class="ledger-row-actions flex items-center gap-1">
               <!-- Edit Button -->
               <button
                 @click="handleEdit(row)"
+                :title="t('common.edit')"
                 class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-dark-700 dark:hover:text-primary-400"
               >
                 <Icon name="edit" size="sm" />
@@ -625,6 +627,7 @@
               <button
                 v-if="row.role !== 'admin'"
                 @click="handleToggleStatus(row)"
+                :title="row.status === 'active' ? t('admin.users.disable') : t('admin.users.enable')"
                 :class="[
                   'flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors',
                   row.status === 'active'
@@ -640,6 +643,9 @@
               <!-- More Actions Menu Trigger -->
               <button
                 @click="openActionMenu(row, $event)"
+                :title="t('common.more')"
+                aria-haspopup="menu"
+                :aria-expanded="activeMenuId === row.id"
                 class="action-menu-trigger flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-dark-700 dark:hover:text-white"
                 :class="{ 'bg-gray-100 text-gray-900 dark:bg-dark-700 dark:text-white': activeMenuId === row.id }"
               >

@@ -7,7 +7,7 @@ import { computed, onScopeDispose, ref, watch } from 'vue'
 import { useAppearance } from '@/composables/useAppearance'
 
 const props = defineProps<{ value: number; formatter?: (value: number) => string; integer?: boolean }>()
-const { isModern } = useAppearance()
+const { isEnhanced } = useAppearance()
 const media = window.matchMedia('(prefers-reduced-motion: reduce)')
 const reduced = ref(media.matches)
 const onMotionChange = (event: MediaQueryListEvent) => { reduced.value = event.matches }
@@ -23,9 +23,9 @@ function stop() {
   if (frame !== undefined) cancelAnimationFrame(frame)
   frame = undefined
 }
-watch([target, () => isModern.value, reduced], ([to]) => {
+watch([target, () => isEnhanced.value, reduced], ([to]) => {
   stop()
-  if (!isModern.value || reduced.value || typeof requestAnimationFrame !== 'function') {
+  if (!isEnhanced.value || reduced.value || typeof requestAnimationFrame !== 'function') {
     displayed.value = to
     return
   }

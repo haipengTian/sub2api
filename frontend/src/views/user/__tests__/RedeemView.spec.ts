@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import RedeemView from '../RedeemView.vue'
+import Pagination from '@/components/common/Pagination.vue'
+import { useAppearance } from '@/composables/useAppearance'
 
 const { redeem, getHistory, refreshUser, fetchActiveSubscriptions, showError, showWarning, showSuccess } = vi.hoisted(() => ({
   redeem: vi.fn(),
@@ -43,6 +45,7 @@ async function submitCode() {
 
 describe('RedeemView refresh after redemption', () => {
   beforeEach(() => {
+    useAppearance().setSkin('modern')
     vi.clearAllMocks()
     redeem.mockResolvedValue({ type: 'balance', value: 20, message: 'Code applied' })
     getHistory.mockResolvedValue({ items: [], total: 0 })
@@ -52,7 +55,33 @@ describe('RedeemView refresh after redemption', () => {
   })
 
   afterEach(() => {
+    useAppearance().setSkin('modern')
     vi.restoreAllMocks()
+  })
+
+  it('uses shared pagination in Credit and keeps the existing server paging contract', async () => {
+    useAppearance().setSkin('credit')
+    getHistory.mockResolvedValue({ items: [], total: 81 })
+    const wrapper = mount(RedeemView, {
+      global: { stubs: { AppLayout: { template: '<div><slot /></div>' }, Icon: true } },
+    })
+    await flushPromises()
+    expect(wrapper.find('select').exists()).toBe(false)
+    const pagination = wrapper.getComponent(Pagination)
+    expect(pagination.props('page')).toBe(1)
+    pagination.vm.$emit('update:page', 2)
+    await flushPromises()
+    expect(getHistory).toHaveBeenLastCalledWith(2, 20)
+    pagination.vm.$emit('update:pageSize', 50)
+    await flushPromises()
+    expect(getHistory).toHaveBeenLastCalledWith(1, 50)
+    expect(pagination.props('page')).toBe(1)
+    await wrapper.get('input#code').setValue('REDEEM-CODE')
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+    expect(getHistory).toHaveBeenLastCalledWith(1, 50)
+    expect(redeem).toHaveBeenCalledWith('REDEEM-CODE')
+    wrapper.unmount()
   })
 
   it.each(['balance', 'concurrency', 'subscription'])(

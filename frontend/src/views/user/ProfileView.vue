@@ -2,7 +2,7 @@
   <AppLayout>
     <div
       data-testid="profile-shell"
-      class="mx-auto max-w-[950px] space-y-6"
+      class="profile-page mx-auto max-w-[950px] space-y-6"
     >
       <ProfileInfoCard
         :user="user"
@@ -32,19 +32,25 @@
         </div>
       </div>
 
-      <ProfilePasswordForm />
+      <div class="profile-security-grid space-y-6">
+        <div class="profile-security-column space-y-6">
+          <ProfilePasswordForm />
 
-      <ProfileBalanceNotifyCard
-        v-if="user && balanceLowNotifyEnabled"
-        :enabled="user.balance_notify_enabled ?? true"
-        :threshold="user.balance_notify_threshold"
-        :extra-emails="user.balance_notify_extra_emails ?? []"
-        :system-default-threshold="systemDefaultThreshold"
-        :user-email="user.email"
-      />
+          <ProfileBalanceNotifyCard
+            v-if="user && balanceLowNotifyEnabled"
+            :enabled="user.balance_notify_enabled ?? true"
+            :threshold="user.balance_notify_threshold"
+            :extra-emails="user.balance_notify_extra_emails ?? []"
+            :system-default-threshold="systemDefaultThreshold"
+            :user-email="user.email"
+          />
+        </div>
 
-      <ProfileTotpCard />
-      <ProfilePasskeyCard :enabled="passkeyEnabled" />
+        <div class="profile-security-column space-y-6">
+          <ProfileTotpCard />
+          <ProfilePasskeyCard :enabled="passkeyEnabled" />
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>

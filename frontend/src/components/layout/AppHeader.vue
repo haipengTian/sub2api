@@ -51,6 +51,7 @@
         </router-link>
 
         <!-- Language Switcher -->
+        <ContentWidthToggle />
         <LocaleSwitcher />
 
         <!-- Subscription Progress (for users with active subscriptions; not mounted at all when the feature is off) -->
@@ -258,6 +259,7 @@ import { useI18n } from 'vue-i18n'
 import { useAppStore, useAuthStore, useOnboardingStore } from '@/stores'
 import { useAdminSettingsStore } from '@/stores/adminSettings'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
+import ContentWidthToggle from '@/components/custom/ContentWidthToggle.vue'
 import SubscriptionProgressMini from '@/components/common/SubscriptionProgressMini.vue'
 import AnnouncementBell from '@/components/common/AnnouncementBell.vue'
 import Icon from '@/components/icons/Icon.vue'

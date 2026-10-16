@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-4">
+  <div class="payment-status-panel space-y-4">
     <!-- ═══ Terminal States: show result, user clicks to return ═══ -->
 
     <!-- Success -->

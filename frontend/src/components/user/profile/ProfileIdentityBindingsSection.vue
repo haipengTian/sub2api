@@ -25,6 +25,7 @@
       <div
         v-for="item in providerItems"
         :key="item.provider"
+        class="profile-binding-row"
         :class="rowClass"
       >
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

@@ -15,6 +15,14 @@ function mountInput(value: number | null = null) {
 }
 
 describe('recharge amount input', () => {
+  it('exposes the selected quick amount and follows external model changes', async () => {
+    const wrapper = mountInput(100)
+    expect(wrapper.get('[data-testid="quick-amount-100"]').attributes('aria-pressed')).toBe('true')
+    expect(wrapper.get('[data-testid="quick-amount-20"]').attributes('aria-pressed')).toBe('false')
+    await wrapper.setProps({ modelValue: 20 })
+    expect(wrapper.get('[data-testid="quick-amount-100"]').attributes('aria-pressed')).toBe('false')
+    expect(wrapper.get('[data-testid="quick-amount-20"]').attributes('aria-pressed')).toBe('true')
+  })
   it.each(['10abc', '10.555', '-10', '1e2'])('restores the accepted amount after rejecting %s', async (value) => {
     const wrapper = mountInput(10)
     const input = wrapper.get('input')

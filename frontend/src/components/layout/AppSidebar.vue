@@ -3,7 +3,7 @@
     class="sidebar"
     :class="[
       sidebarCollapsed ? 'w-[72px]' : 'w-64',
-      { '-translate-x-full lg:translate-x-0': !mobileOpen, 'sidebar-admin': isAdmin }
+      { '-translate-x-full lg:translate-x-0': !mobileOpen, 'sidebar-admin': isAdmin, 'sidebar-collapsed': sidebarCollapsed }
     ]"
   >
     <!-- Logo/Brand -->
@@ -35,7 +35,7 @@
       <template v-if="isAdmin">
         <!-- Admin Section -->
         <div class="sidebar-section">
-          <div v-if="isModern" class="sidebar-section-title" :class="{ 'sidebar-section-title-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
+          <div v-if="isEnhanced" class="sidebar-section-title" :class="{ 'sidebar-section-title-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
             <span class="sidebar-section-title-text" :class="{ 'sidebar-section-title-text-collapsed': sidebarCollapsed }">{{ t('appearance.adminSection') }}</span>
           </div>
           <template v-for="item in adminNavItems" :key="item.path">
@@ -156,12 +156,16 @@
 
       <!-- Collapse Button -->
       <button
+        type="button"
         @click="toggleSidebar"
-        class="sidebar-link w-full"
+        class="sidebar-link sidebar-collapse-trigger w-full"
         :class="{ 'sidebar-link-collapsed': sidebarCollapsed }"
         :title="sidebarCollapsed ? t('nav.expand') : t('nav.collapse')"
+        :aria-label="sidebarCollapsed ? t('nav.expand') : t('nav.collapse')"
+        :aria-expanded="!sidebarCollapsed"
       >
-        <ChevronDoubleLeftIcon v-if="!sidebarCollapsed" class="h-5 w-5 flex-shrink-0" />
+        <Icon v-if="isCredit" :name="sidebarCollapsed ? 'chevronRight' : 'chevronLeft'" size="lg" />
+        <ChevronDoubleLeftIcon v-else-if="!sidebarCollapsed" class="h-5 w-5 flex-shrink-0" />
         <ChevronDoubleRightIcon v-else class="h-5 w-5 flex-shrink-0" />
         <span class="sidebar-label" :class="{ 'sidebar-label-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">{{ t('nav.collapse') }}</span>
       </button>
@@ -230,7 +234,7 @@ function applyFeatureFlags(items: NavItem[]): NavItem[] {
 }
 
 const { t } = useI18n()
-const { isModern } = useAppearance()
+const { isEnhanced, isCredit } = useAppearance()
 
 const route = useRoute()
 const router = useRouter()

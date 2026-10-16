@@ -1,7 +1,7 @@
 <template>
-  <div class="relative flex min-h-screen flex-col bg-gray-50 dark:bg-dark-950">
+  <div class="key-usage-page relative flex min-h-screen flex-col bg-gray-50 dark:bg-dark-950">
     <!-- Header (same pattern as HomeView) -->
-    <header class="relative z-20 px-6 py-4">
+    <header class="credit-public-nav relative z-20 px-6 py-4">
       <nav class="mx-auto flex max-w-6xl items-center justify-between">
         <router-link to="/home" class="flex items-center gap-3">
           <div class="h-10 w-10 overflow-hidden rounded-xl shadow-md">
@@ -34,9 +34,9 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-12">
+    <main class="key-usage-main flex-1 w-full max-w-5xl mx-auto px-6 py-12">
       <!-- Hero -->
-      <div class="text-center mb-12">
+      <div class="key-usage-heading text-center mb-12">
         <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-gray-900 dark:text-white">
           {{ t('keyUsage.title') }}
         </h1>
@@ -46,9 +46,9 @@
       </div>
 
       <!-- Input Section -->
-      <div class="max-w-xl mx-auto mb-14">
+      <div class="key-usage-search max-w-xl mx-auto mb-14">
         <div class="flex gap-3">
-          <div class="flex-1 relative">
+          <div class="key-usage-input flex-1 relative">
             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -206,14 +206,14 @@
                     />
                     <defs>
                       <linearGradient :id="`ring-grad-${i}`" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" :stop-color="RING_GRADIENTS[i % 4].from"/>
-                        <stop offset="100%" :stop-color="RING_GRADIENTS[i % 4].to"/>
+                        <stop offset="0%" :stop-color="ringGradients[i % 4].from"/>
+                        <stop offset="100%" :stop-color="ringGradients[i % 4].to"/>
                       </linearGradient>
                     </defs>
                   </svg>
                   <div class="absolute inset-0 flex flex-col items-center justify-center">
                     <template v-if="ring.isBalance">
-                      <span class="text-2xl font-bold tabular-nums" :style="{ color: RING_GRADIENTS[i % 4].from }">
+                      <span class="text-2xl font-bold tabular-nums" :style="{ color: ringGradients[i % 4].from }">
                         {{ ring.amount }}
                       </span>
                     </template>
@@ -224,7 +224,7 @@
                       <span class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">{{ t('keyUsage.used') }}</span>
                       <span
                         class="text-sm font-semibold mt-1 tabular-nums"
-                        :style="{ color: RING_GRADIENTS[i % 4].from }"
+                        :style="{ color: ringGradients[i % 4].from }"
                       >{{ ring.amount }}</span>
                       <p v-if="ring.resetAt && formatResetTime(ring.resetAt)" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 tabular-nums">
                         ⟳ {{ formatResetTime(ring.resetAt) }}
@@ -310,7 +310,7 @@
                 </button>
               </div>
             </div>
-            <div v-if="dailyUsageRows.length > 0" class="overflow-x-auto">
+            <div v-if="dailyUsageRows.length > 0" class="key-usage-table-scroll overflow-x-auto">
               <table class="w-full">
                 <thead>
                   <tr class="border-b border-gray-200 bg-gray-50 dark:border-dark-700 dark:bg-dark-950">
@@ -419,6 +419,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { usePreferredReducedMotion } from '@vueuse/core'
+import { useAppearance } from '@/composables/useAppearance'
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { useAppStore } from '@/stores'
 import { FeatureFlags, resolveFeatureFlag } from '@/utils/featureFlags'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
@@ -428,6 +431,9 @@ import { formatDateLocalInput } from '@/utils/format'
 import { sanitizeUrl } from '@/utils/url'
 
 const { t, locale } = useI18n()
+const { isCredit } = useAppearance()
+const { themeColor } = useChartAppearance()
+const reducedMotion = usePreferredReducedMotion()
 const appStore = useAppStore()
 const subscriptionFeatureEnabled = computed(() => resolveFeatureFlag(appStore.cachedPublicSettings, FeatureFlags.subscription))
 
@@ -538,7 +544,12 @@ const RING_GRADIENTS = [
 const ringAnimated = ref(false)
 const displayPcts = ref<number[]>([])
 
-const ringTrackColor = computed(() => isDark.value ? '#222222' : '#F0F0EE')
+const ringGradients = computed(() => isCredit.value
+  ? RING_GRADIENTS.map(({ from }) => ({ from: themeColor(from), to: themeColor(from) }))
+  : RING_GRADIENTS)
+const ringTrackColor = computed(() => isCredit.value
+  ? (isDark.value ? '#27272a' : '#f4f4f5')
+  : (isDark.value ? '#222222' : '#F0F0EE'))
 
 interface RingItem {
   title: string
@@ -556,6 +567,11 @@ function getRingOffset(ring: RingItem): number {
 }
 
 function triggerRingAnimation(items: RingItem[]) {
+  if (isCredit.value && reducedMotion.value === 'reduce') {
+    ringAnimated.value = true
+    displayPcts.value = items.map(item => item.isBalance ? 0 : item.pct)
+    return
+  }
   ringAnimated.value = false
   displayPcts.value = items.map(() => 0)
 

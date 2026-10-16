@@ -3,6 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 
 import KeyUsageView from '../KeyUsageView.vue'
+import { useAppearance } from '@/composables/useAppearance'
 
 const { showInfo, showSuccess, showError, fetchPublicSettings } = vi.hoisted(() => ({
   showInfo: vi.fn(),
@@ -114,7 +115,7 @@ describe('KeyUsageView daily detail', () => {
 
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
-      value: vi.fn().mockReturnValue({ matches: false }),
+      value: vi.fn().mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn(), addListener: vi.fn(), removeListener: vi.fn() }),
     })
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => window.setTimeout(() => cb(0), 0))
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
@@ -245,7 +246,7 @@ describe('KeyUsageView subscription feature flag', () => {
     localStorage.clear()
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
-      value: vi.fn().mockReturnValue({ matches: false }),
+      value: vi.fn().mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn(), addListener: vi.fn(), removeListener: vi.fn() }),
     })
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => window.setTimeout(() => cb(0), 0))
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
@@ -304,5 +305,20 @@ describe('KeyUsageView subscription feature flag', () => {
     expect(wrapper.text()).not.toContain('Subscription Type')
     expect(wrapper.text()).toContain('Wallet Balance')
     wrapper.unmount()
+  })
+
+  it('uses the shared Credit ring palette and restores original colors on skin change', async () => {
+    const { setSkin } = useAppearance()
+    setSkin('credit')
+    const wrapper = await mountAndQuery()
+    try {
+      expect(wrapper.find('linearGradient stop').attributes('stop-color')).toBe('#4ea7a1')
+      setSkin('classic')
+      await nextTick()
+      expect(wrapper.find('linearGradient stop').attributes('stop-color')).toBe('#14b8a6')
+    } finally {
+      wrapper.unmount()
+      setSkin('modern')
+    }
   })
 })

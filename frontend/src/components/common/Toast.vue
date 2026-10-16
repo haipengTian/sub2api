@@ -1,23 +1,19 @@
 <template>
   <Teleport to="body">
     <div
-      class="pointer-events-none fixed right-4 top-4 z-[9999] space-y-3"
+      class="toast-stack pointer-events-none fixed right-4 top-4 z-[9999] space-y-3"
       aria-live="polite"
       aria-atomic="true"
     >
       <TransitionGroup
-        enter-active-class="transition ease-out duration-300"
-        enter-from-class="opacity-0 translate-x-full"
-        enter-to-class="opacity-100 translate-x-0"
-        leave-active-class="transition ease-in duration-200"
-        leave-from-class="opacity-100 translate-x-0"
-        leave-to-class="opacity-0 translate-x-full"
+        name="toast"
       >
         <div
           v-for="toast in toasts"
           :key="toast.id"
+          :data-type="toast.type"
           :class="[
-            'pointer-events-auto min-w-[320px] max-w-md overflow-hidden rounded-lg shadow-lg',
+            'toast-item pointer-events-auto min-w-[320px] max-w-md overflow-hidden rounded-lg shadow-lg',
             'bg-white dark:bg-dark-800',
             'border-l-4',
             getBorderColor(toast.type)
@@ -135,6 +131,11 @@ const removeToast = (id: string) => {
 </script>
 
 <style scoped>
+/* Keep the existing original-skin slide; Credit overrides these named phases. */
+.toast-enter-active { transition: opacity 300ms ease-out, transform 300ms ease-out; }
+.toast-leave-active { transition: opacity 200ms ease-in, transform 200ms ease-in; }
+.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(100%); }
+
 .toast-progress {
   width: 100%;
   animation-name: toast-progress-shrink;

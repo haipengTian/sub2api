@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
+    <div class="subscriptions-page space-y-6">
       <!-- Loading State -->
       <div v-if="loading" class="flex justify-center py-12">
         <div
@@ -9,7 +9,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="subscriptions.length === 0" class="card p-12 text-center">
+      <div v-else-if="subscriptions.length === 0" class="subscription-empty card p-12 text-center">
         <div
           class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-dark-700"
         >
@@ -24,16 +24,16 @@
       </div>
 
       <!-- Subscriptions Grid -->
-      <div v-else class="grid gap-6 lg:grid-cols-2">
+      <div v-else class="subscription-grid grid gap-6 lg:grid-cols-2">
         <div
           v-for="subscription in subscriptions"
           :key="subscription.id"
-          class="overflow-hidden rounded-2xl border bg-white dark:bg-dark-800"
+          class="subscription-panel overflow-hidden rounded-2xl border bg-white dark:bg-dark-800"
           :class="platformBorderClass(subscription.group?.platform || '')"
         >
           <!-- Header -->
           <div
-            class="flex items-center justify-between border-b border-gray-100 p-4 dark:border-dark-700"
+            class="subscription-header flex items-center justify-between border-b border-gray-100 p-4 dark:border-dark-700"
           >
             <div class="flex items-center gap-3">
               <div :class="['h-1.5 w-1.5 shrink-0 rounded-full', platformAccentDotClass(subscription.group?.platform || '')]" />
@@ -81,7 +81,7 @@
           </div>
 
           <!-- Usage Progress -->
-          <div class="space-y-4 p-4">
+          <div class="subscription-body space-y-4 p-4">
             <!-- Expiration Info -->
             <div v-if="subscription.expires_at" class="flex items-center justify-between text-sm">
               <span class="text-gray-500 dark:text-dark-400">{{
@@ -226,7 +226,7 @@
                 !subscription.group?.weekly_limit_usd &&
                 !subscription.group?.monthly_limit_usd
               "
-              class="flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 py-6 dark:from-emerald-900/20 dark:to-teal-900/20"
+              class="subscription-unlimited flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 py-6 dark:from-emerald-900/20 dark:to-teal-900/20"
             >
               <div class="flex items-center gap-3">
                 <span class="text-4xl text-emerald-600 dark:text-emerald-400">∞</span>

@@ -2,11 +2,11 @@
   <AppLayout>
     <div class="relative space-y-6" :aria-busy="loading || loadingCharts || loadingUsage">
       <RefreshIndicator :active="loading && !!stats" />
-      <LoadingPlaceholder v-if="loading && !stats && isModern" kind="dashboard" :is-simple="authStore.isSimpleMode" :payment-enabled="paymentEnabled" />
-      <div v-else-if="loading && (!isModern || !stats)" class="flex items-center justify-center py-12"><LoadingSpinner /></div>
+      <LoadingPlaceholder v-if="loading && !stats && isEnhanced" kind="dashboard" :is-simple="authStore.isSimpleMode" :payment-enabled="paymentEnabled" />
+      <div v-else-if="loading && (!isEnhanced || !stats)" class="flex items-center justify-center py-12"><LoadingSpinner /></div>
       <template v-else-if="stats">
-        <DashboardWelcome v-if="isModern" :name="user?.username || ''" :balance="user?.balance || 0" :requests="stats.today_requests" :cost="stats.today_actual_cost" :is-simple="authStore.isSimpleMode" />
-        <div class="dashboard-stats space-y-6"><UserDashboardStats :stats="stats" :balance="user?.balance || 0" :is-simple="authStore.isSimpleMode" :platform-quotas="platformQuotas" :hide-balance="isModern" /></div>
+        <DashboardWelcome v-if="isEnhanced" :name="user?.username || ''" :balance="user?.balance || 0" :requests="stats.today_requests" :cost="stats.today_actual_cost" :is-simple="authStore.isSimpleMode" />
+        <div class="dashboard-stats space-y-6"><UserDashboardStats :stats="stats" :balance="user?.balance || 0" :is-simple="authStore.isSimpleMode" :platform-quotas="platformQuotas" :hide-balance="isEnhanced" /></div>
         <UserDashboardCharts class="dashboard-charts" v-model:startDate="startDate" v-model:endDate="endDate" v-model:granularity="granularity" :loading="loadingCharts" :refreshing="loading || loadingUsage || loadingQuotas" :resolved="chartsResolved" :trend="trendData" :models="modelStats" @dateRangeChange="loadCharts" @granularityChange="loadCharts" @refresh="refreshAll" />
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div class="lg:col-span-2"><UserDashboardRecentUsage :data="recentUsage" :loading="loadingUsage" :resolved="usageResolved" /></div>
@@ -31,7 +31,7 @@ import LoadingPlaceholder from '@/components/custom/LoadingPlaceholder.vue'
 import RefreshIndicator from '@/components/custom/RefreshIndicator.vue'
 import { useAppStore } from '@/stores/app'
 import { FeatureFlags, resolveFeatureFlag } from '@/utils/featureFlags'
-const { isModern } = useAppearance()
+const { isEnhanced } = useAppearance()
 const appStore = useAppStore()
 const paymentEnabled = computed(() => resolveFeatureFlag(appStore.cachedPublicSettings, FeatureFlags.payment))
 

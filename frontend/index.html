@@ -8,7 +8,9 @@
     <script nonce="__CSP_NONCE_VALUE__">
       // Apply appearance before styles paint; the backend substitutes the CSP nonce.
       try {
-        document.documentElement.dataset.skin = localStorage.getItem('sub2api-skin') === 'classic' ? 'classic' : 'modern'
+        const skin = localStorage.getItem('sub2api-skin')
+        document.documentElement.dataset.skin = skin === 'classic' || skin === 'credit' ? skin : 'modern'
+        document.documentElement.dataset.contentWidth = localStorage.getItem('sub2api-credit-full-width') === 'true' ? 'full' : 'contained'
         const theme = localStorage.getItem('theme')
         document.documentElement.classList.toggle('dark', theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches))
       } catch {

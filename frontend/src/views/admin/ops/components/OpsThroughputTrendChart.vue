@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Chart as ChartJS, CategoryScale, Filler, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js'
@@ -12,6 +13,8 @@ import EmptyState from '@/components/common/EmptyState.vue'
 import { formatNumber } from '@/utils/format'
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, LinearScale, PointElement, CategoryScale, Filler)
+
+const { themeData, themeOptions, themeColor, chartAppearanceKey } = useChartAppearance()
 
 interface Props {
   points: OpsThroughputTrendPoint[]
@@ -173,7 +176,7 @@ function downloadChart() {
 </script>
 
 <template>
-  <div class="flex h-full min-w-0 flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-dark-800 dark:ring-dark-700">
+  <div class="credit-chart-panel flex h-full min-w-0 flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-dark-800 dark:ring-dark-700">
     <div
       data-testid="throughput-chart-header"
       class="mb-4 flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
@@ -189,8 +192,8 @@ function downloadChart() {
         data-testid="throughput-chart-toolbar"
         class="flex w-full min-w-0 flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400 sm:w-auto sm:justify-end"
       >
-        <span class="flex shrink-0 items-center gap-1"><span class="h-2 w-2 rounded-full bg-blue-500"></span>QPS</span>
-        <span class="flex shrink-0 items-center gap-1"><span class="h-2 w-2 rounded-full bg-green-500"></span>{{ t('admin.ops.tpsK') }}</span>
+        <span class="flex shrink-0 items-center gap-1"><span class="h-2 w-2 rounded-full bg-blue-500" :style="{ backgroundColor: themeColor('#3b82f6') }"></span>QPS</span>
+        <span class="flex shrink-0 items-center gap-1"><span class="h-2 w-2 rounded-full bg-green-500" :style="{ backgroundColor: themeColor('#22c55e') }"></span>{{ t('admin.ops.tpsK') }}</span>
         <template v-if="!props.fullscreen">
           <button
             type="button"
@@ -251,7 +254,7 @@ function downloadChart() {
     </div>
 
     <div class="min-h-0 min-w-0 flex-1">
-      <Line v-if="state === 'ready' && chartData" ref="throughputChartRef" :data="chartData" :options="options" />
+      <Line :key="chartAppearanceKey" v-if="state === 'ready' && chartData" ref="throughputChartRef" :data="themeData('line', chartData)" :options="themeOptions('line', options)" />
       <div v-else class="flex h-full items-center justify-center">
         <div v-if="state === 'loading'" class="animate-pulse text-sm text-gray-400">{{ t('common.loading') }}</div>
         <EmptyState v-else :title="t('common.noData')" :description="t('admin.ops.charts.emptyRequest')" />

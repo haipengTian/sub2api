@@ -12,8 +12,11 @@ import { getMyPlatformQuotas } from '@/api/user'
 import AnimatedNumber from '../AnimatedNumber.vue'
 import UserDashboardCharts from '@/components/user/dashboard/UserDashboardCharts.vue'
 
-const state = vi.hoisted(() => ({ modern: true, stats: vi.fn() }))
-vi.mock('@/composables/useAppearance', () => ({ useAppearance: () => ({ isModern: { get value() { return state.modern } }, isDark: { value: false } }) }))
+const state = vi.hoisted(() => ({ modern: true, credit: false, stats: vi.fn() }))
+vi.mock('@/composables/useAppearance', async () => {
+  const { computed } = await import('vue')
+  return { useAppearance: () => ({ isModern: computed(() => state.modern), isCredit: computed(() => state.credit), isEnhanced: computed(() => state.modern || state.credit), isDark: computed(() => false) }) }
+})
 vi.mock('vue-i18n', async original => ({ ...await original<typeof import('vue-i18n')>(), useI18n: () => ({ t: (key: string) => key }) }))
 vi.mock('@/stores/auth', () => ({ useAuthStore: () => ({ user: { username: 'Demo', balance: 12 }, isSimpleMode: false, refreshUser: vi.fn().mockResolvedValue(undefined) }) }))
 vi.mock('@/api/usage', () => ({ usageAPI: {
@@ -27,7 +30,7 @@ vi.mock('vue-chartjs', () => ({ Line: { template: '<div data-test="chart" />' },
 
 const wrappers: ReturnType<typeof mount>[] = []
 beforeEach(() => {
-  setActivePinia(createPinia()); state.modern = true; state.stats.mockReset()
+  setActivePinia(createPinia()); state.modern = true; state.credit = false; state.stats.mockReset()
   vi.mocked(usageAPI.getDashboardTrend).mockResolvedValue({ trend: [] } as never)
   vi.mocked(usageAPI.getDashboardModels).mockResolvedValue({ models: [] } as never)
   vi.mocked(usageAPI.getByDateRange).mockResolvedValue({ items: [] } as never)
@@ -40,6 +43,18 @@ function render(component: Parameters<typeof mount>[0], options: Parameters<type
 const tableProps = { columns: [{ key: 'name', label: 'Name' }], data: [{ id: 1, name: 'Existing key' }] }
 
 describe('modern loading presentation', () => {
+  it('shows the balance and actions in Credit without changing the classic skin', async () => {
+    state.modern = false; state.credit = true
+    state.stats.mockResolvedValueOnce({ today_requests: 286, today_actual_cost: 1.84 })
+    const w = render(DashboardView, { global: { stubs: {
+      AppLayout: { template: '<div><slot /></div>' }, DashboardWelcome: true,
+      UserDashboardStats: true, UserDashboardCharts: true,
+      UserDashboardRecentUsage: true, UserDashboardQuickActions: true,
+    } } })
+    await flushPromises()
+    expect(w.findComponent({ name: 'DashboardWelcome' }).exists()).toBe(true)
+    expect(w.findComponent(UserDashboardStats).props('hideBalance')).toBe(true)
+  })
   it.each([true, false])('retains table rows during refresh (desktop=%s)', async desktop => {
     vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ matches: desktop, media: query, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as MediaQueryList)
     const w = render(DataTable, { props: tableProps })

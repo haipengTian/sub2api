@@ -73,7 +73,7 @@
     </div>
     <div v-else-if="displayEndpointStats.length > 0 && chartData" class="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
       <div class="h-48 w-48 shrink-0">
-        <Doughnut :data="chartData" :options="doughnutOptions" />
+        <Doughnut :key="chartAppearanceKey" :data="themeData('doughnut', chartData)" :options="themeOptions('doughnut', doughnutOptions)" />
       </div>
       <div class="max-h-48 w-full min-w-0 flex-1 overflow-auto">
         <table class="modern-compact-table w-full text-xs">
@@ -133,6 +133,7 @@
 </template>
 
 <script setup lang="ts">
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
@@ -143,6 +144,8 @@ import type { EndpointStat, UserBreakdownItem } from '@/types'
 import { getUserBreakdown } from '@/api/admin/dashboard'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
+
+const { themeData, themeOptions, chartAppearanceKey } = useChartAppearance()
 
 const { t } = useI18n()
 

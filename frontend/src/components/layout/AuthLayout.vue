@@ -1,6 +1,10 @@
 <template>
   <div class="auth-shell relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+    <router-link v-if="isCredit" to="/home" class="auth-back-home" :aria-label="t('appearance.backHome')">
+      <Icon name="arrowLeft" size="md" /><span>{{ t('appearance.backHome') }}</span>
+    </router-link>
     <div class="auth-appearance"><AppearanceControls /></div>
+    <div v-if="isCredit" class="credit-auth-aurora" aria-hidden="true"><div class="credit-auth-aurora-lights"></div></div>
     <aside v-if="isModern" class="modern-auth-brand">
       <router-link to="/" class="modern-auth-logo">
         <img :src="siteLogo || '/logo.svg'" :alt="siteName" />
@@ -43,14 +47,16 @@
     <!-- Content Container -->
     <div class="auth-content relative z-10 w-full max-w-md">
       <!-- Logo/Brand -->
-      <div v-if="!isModern" class="mb-8 text-center">
+      <div v-if="!isModern" class="auth-brand mb-8 text-center">
         <!-- Custom Logo or Default Logo -->
         <template v-if="settingsLoaded">
-          <div
-            class="mb-4 inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl shadow-lg shadow-primary-500/30"
+          <router-link
+            :to="isCredit ? '/home' : '/'"
+            :aria-label="t('appearance.backHome')"
+            class="auth-brand-logo mb-4 inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl shadow-lg shadow-primary-500/30"
           >
             <img :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
-          </div>
+          </router-link>
           <h1 class="text-gradient mb-2 text-3xl font-bold">
             {{ siteName }}
           </h1>
@@ -66,12 +72,12 @@
       </div>
 
       <!-- Footer Links -->
-      <div class="mt-6 text-center text-sm">
+      <div class="auth-footer mt-6 text-center text-sm">
         <slot name="footer" />
       </div>
 
       <!-- Copyright -->
-      <div class="mt-8 text-center text-xs text-gray-400 dark:text-dark-500">
+      <div class="auth-copyright mt-8 text-center text-xs text-gray-400 dark:text-dark-500">
         &copy; {{ currentYear }} {{ siteName }}. All rights reserved.
       </div>
     </div>
@@ -85,9 +91,10 @@ import { sanitizeUrl } from '@/utils/url'
 import { useI18n } from 'vue-i18n'
 import { useAppearance } from '@/composables/useAppearance'
 import AppearanceControls from '@/components/custom/AppearanceControls.vue'
+import Icon from '@/components/icons/Icon.vue'
 
 const { t } = useI18n()
-const { isModern } = useAppearance()
+const { isModern, isCredit } = useAppearance()
 
 const appStore = useAppStore()
 

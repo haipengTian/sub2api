@@ -5,6 +5,7 @@
       :interval-seconds="DEFAULT_INTERVAL_SECONDS"
       :window="currentWindow"
       :loading="loading"
+      :has-channels="items.length > 0"
       :auto-refresh="autoRefresh"
       @update:window="handleWindowChange"
       @refresh="refresh()"

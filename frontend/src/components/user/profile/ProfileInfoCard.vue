@@ -1,13 +1,13 @@
 <template>
-  <div class="space-y-6">
+  <div class="profile-info space-y-6">
     <section
       data-testid="profile-overview-hero"
       class="card overflow-hidden border border-primary-100/80 bg-gradient-to-br from-primary-50 via-white to-amber-50/70 dark:border-primary-900/40 dark:from-primary-950/40 dark:via-dark-900 dark:to-dark-950"
     >
-      <div class="px-6 py-6 md:px-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+      <div class="profile-overview-body px-6 py-6 md:px-8">
+        <div class="profile-overview-layout flex flex-col gap-6 lg:flex-row lg:items-start">
           <div
-            class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary-500 to-primary-600 text-2xl font-bold text-white shadow-lg shadow-primary-500/20"
+            class="profile-overview-avatar flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary-500 to-primary-600 text-2xl font-bold text-white shadow-lg shadow-primary-500/20"
           >
             <img
               v-if="avatarUrl"
@@ -18,7 +18,7 @@
             <span v-else>{{ avatarInitial }}</span>
           </div>
 
-          <div class="min-w-0 flex-1 space-y-5">
+          <div class="profile-overview-details min-w-0 flex-1 space-y-5">
             <div class="space-y-3">
               <div class="flex flex-wrap items-center gap-2">
                 <h2 class="truncate text-2xl font-semibold text-gray-900 dark:text-white">
@@ -58,7 +58,7 @@
               </div>
             </div>
 
-            <div class="grid gap-3 sm:grid-cols-3">
+            <div class="profile-overview-metrics grid gap-3 sm:grid-cols-3">
               <div
                 data-testid="profile-overview-metric-balance"
                 class="rounded-2xl bg-white/85 px-4 py-3 shadow-sm ring-1 ring-white/70 dark:bg-dark-900/60 dark:ring-dark-700"
@@ -98,8 +98,8 @@
       </div>
     </section>
 
-    <div class="space-y-6">
-      <div data-testid="profile-main-column" class="space-y-6">
+    <div class="profile-info-sections space-y-6">
+      <div data-testid="profile-main-column" class="profile-main-column space-y-6">
         <section
           data-testid="profile-basics-panel"
           class="card border border-gray-100 bg-white/90 p-6 dark:border-dark-700 dark:bg-dark-900/50"
@@ -115,15 +115,15 @@
             </div>
           </div>
 
-          <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
-            <div class="rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-dark-700 dark:bg-dark-900/30">
+          <div class="profile-basics-grid grid gap-6 sm:grid-cols-1 md:grid-cols-2">
+            <div class="profile-basics-field rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-dark-700 dark:bg-dark-900/30">
               <ProfileAvatarCard
                 :user="user"
                 embedded
               />
             </div>
 
-            <div class="rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-dark-700 dark:bg-dark-900/30">
+            <div class="profile-basics-field rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-dark-700 dark:bg-dark-900/30">
               <ProfileEditForm
                 :initial-username="user?.username || ''"
                 embedded

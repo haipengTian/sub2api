@@ -4,12 +4,12 @@
     <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
       {{ t('admin.dashboard.tokenUsageTrend') }}
     </h3>
-    <LoadingPlaceholder v-if="showPlaceholder && isModern" kind="chart" />
+    <LoadingPlaceholder v-if="showPlaceholder && isEnhanced" kind="chart" />
     <div v-else-if="showPlaceholder" class="flex h-48 items-center justify-center">
       <LoadingSpinner />
     </div>
     <div v-else-if="trendData.length > 0 && chartData" class="h-48">
-      <Line :data="chartData" :options="lineOptions" />
+      <Line :key="chartAppearanceKey" :data="themeData('line', chartData)" :options="themeOptions('line', lineOptions)" />
     </div>
     <div
       v-else
@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
@@ -43,6 +44,8 @@ import LoadingPlaceholder from '@/components/custom/LoadingPlaceholder.vue'
 import RefreshIndicator from '@/components/custom/RefreshIndicator.vue'
 import { usePreferredReducedMotion } from '@vueuse/core'
 
+const { themeData, themeOptions, chartAppearanceKey } = useChartAppearance()
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -62,14 +65,14 @@ const props = defineProps<{
   resolved?: boolean
 }>()
 
-const { isDark: isDarkMode, isModern } = useAppearance()
+const { isDark: isDarkMode, isModern, isCredit, isEnhanced } = useAppearance()
 const { showPlaceholder } = useLoadingPresentation(() => !!props.loading, () => props.trendData.length > 0, () => !!props.resolved)
 const reducedMotion = usePreferredReducedMotion()
 
 const chartColors = computed(() => ({
   text: isDarkMode.value ? '#e5e7eb' : '#374151',
-  grid: isDarkMode.value ? '#374151' : '#e5e7eb',
-  input: isModern.value ? (isDarkMode.value ? '#c3cfc6' : '#19251e') : '#3b82f6',
+  grid: isCredit.value ? (isDarkMode.value ? '#27272a' : '#f0f0f2') : isDarkMode.value ? '#374151' : '#e5e7eb',
+  input: isCredit.value ? '#6366f1' : isModern.value ? (isDarkMode.value ? '#c3cfc6' : '#19251e') : '#3b82f6',
   output: isModern.value ? '#509c70' : '#10b981',
   cacheCreation: '#f59e0b',
   cacheRead: '#06b6d4',
@@ -132,7 +135,7 @@ const chartData = computed(() => {
 })
 
 const lineOptions = computed(() => ({
-  animation: isModern.value ? (reducedMotion.value === 'reduce' ? false as const : { duration: 350 }) : undefined,
+  animation: isEnhanced.value ? (reducedMotion.value === 'reduce' ? false as const : { duration: 350 }) : undefined,
   responsive: true,
   maintainAspectRatio: false,
   interaction: {

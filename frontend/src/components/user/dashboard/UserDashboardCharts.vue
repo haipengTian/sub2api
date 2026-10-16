@@ -24,14 +24,14 @@
       <!-- Model Distribution Chart -->
       <div class="card relative overflow-hidden p-4" :aria-busy="loading">
         <RefreshIndicator :active="loading" />
-        <div v-if="loading && !isModern" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-sm dark:bg-dark-800/50">
+        <div v-if="loading && !isEnhanced" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-sm dark:bg-dark-800/50">
           <LoadingSpinner size="md" />
         </div>
         <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">{{ t('dashboard.modelDistribution') }}</h3>
-        <LoadingPlaceholder v-if="showPlaceholder && isModern" kind="chart" />
+        <LoadingPlaceholder v-if="showPlaceholder && isEnhanced" kind="chart" />
         <div v-else class="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
           <div class="h-48 w-48 shrink-0">
-            <Doughnut v-if="modelData" :data="modelData" :options="doughnutOptions" />
+            <Doughnut :key="chartAppearanceKey" v-if="modelData" :data="themeData('doughnut', modelData)" :options="themeOptions('doughnut', doughnutOptions)" />
             <div v-else class="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400">{{ t('dashboard.noDataAvailable') }}</div>
           </div>
           <div class="max-h-48 w-full min-w-0 flex-1 overflow-auto">
@@ -66,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { computed } from 'vue'
 import { usePreferredReducedMotion } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
@@ -82,10 +83,12 @@ import { formatCostFixed as formatCost, formatNumberLocaleString as formatNumber
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler)
 
+const { themeData, themeOptions, chartAppearanceKey } = useChartAppearance()
+
 const props = defineProps<{ loading: boolean, refreshing?: boolean, resolved?: boolean, startDate: string, endDate: string, granularity: string, trend: TrendDataPoint[], models: ModelStat[] }>()
 defineEmits(['update:startDate', 'update:endDate', 'update:granularity', 'dateRangeChange', 'granularityChange', 'refresh'])
 const { t } = useI18n()
-const { isModern, showPlaceholder } = useLoadingPresentation(() => props.loading, () => props.models.length > 0, () => !!props.resolved)
+const { isEnhanced, showPlaceholder } = useLoadingPresentation(() => props.loading, () => props.models.length > 0, () => !!props.resolved)
 const reducedMotion = usePreferredReducedMotion()
 
 const modelData = computed(() => !props.models?.length ? null : {
@@ -97,7 +100,7 @@ const modelData = computed(() => !props.models?.length ? null : {
 })
 
 const doughnutOptions = computed(() => ({
-  animation: isModern.value ? (reducedMotion.value === 'reduce' ? false as const : { duration: 350 }) : undefined,
+  animation: isEnhanced.value ? (reducedMotion.value === 'reduce' ? false as const : { duration: 350 }) : undefined,
   responsive: true,
   maintainAspectRatio: false,
   plugins: {

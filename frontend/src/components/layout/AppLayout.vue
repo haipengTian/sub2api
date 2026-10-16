@@ -9,7 +9,7 @@
     <!-- Main Content Area -->
     <div
       class="relative min-h-screen transition-all duration-300"
-      :class="[sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64']"
+      :class="[sidebarCollapsed ? (isCredit ? 'lg:ml-16' : 'lg:ml-[72px]') : (isCredit ? 'lg:ml-60' : 'lg:ml-64')]"
     >
       <!-- Header -->
       <AppHeader />
@@ -32,8 +32,10 @@ import { useOnboardingTour } from '@/composables/useOnboardingTour'
 import { useOnboardingStore } from '@/stores/onboarding'
 import AppSidebar from './AppSidebar.vue'
 import AppHeader from './AppHeader.vue'
+import { useAppearance } from '@/composables/useAppearance'
 
 const appStore = useAppStore()
+const { isCredit } = useAppearance()
 const route = useRoute()
 const authStore = useAuthStore()
 const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)

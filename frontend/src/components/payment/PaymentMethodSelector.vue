@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="payment-method-selector">
     <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
       {{ t('payment.paymentMethod') }}
     </label>
@@ -13,6 +13,7 @@
         type="button"
         :title="methodLabel(method)"
         :disabled="!method.available"
+        :aria-pressed="selected === method.type"
         :class="[
           'relative flex h-[60px] min-w-0 flex-col items-center justify-center rounded-lg border px-3 transition-all',
           !method.available

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Chart as ChartJS, ArcElement, Legend, Tooltip } from 'chart.js'
@@ -9,6 +10,8 @@ import HelpTooltip from '@/components/common/HelpTooltip.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
+
+const { themeData, themeOptions, themeColor, chartAppearanceKey } = useChartAppearance()
 
 interface Props {
   data: OpsErrorDistributionResponse | null
@@ -109,7 +112,7 @@ const options = computed(() => ({
 </script>
 
 <template>
-  <div class="flex h-full flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-dark-800 dark:ring-dark-700">
+  <div class="credit-chart-panel flex h-full flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-dark-800 dark:ring-dark-700">
     <div class="mb-4 flex items-center justify-between">
       <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white">
         <svg class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,15 +140,15 @@ const options = computed(() => ({
     <div class="relative min-h-0 flex-1">
       <div v-if="state === 'ready' && chartData" class="flex h-full flex-col">
         <div class="flex-1">
-          <Doughnut :data="chartData" :options="{ ...options, cutout: '65%' }" />
+          <Doughnut :key="chartAppearanceKey" :data="themeData('doughnut', chartData)" :options="themeOptions('doughnut', { ...options, cutout: '65%' })" />
         </div>
         <div class="mt-4 flex flex-col items-center gap-2">
           <div v-if="topReason" class="text-xs font-bold text-gray-900 dark:text-white">
-            {{ t('admin.ops.top') }}: <span :style="{ color: topReason.color }">{{ topReason.label }}</span>
+            {{ t('admin.ops.top') }}: <span :style="{ color: themeColor(topReason.color) }">{{ topReason.label }}</span>
           </div>
           <div class="flex flex-wrap justify-center gap-3">
             <div v-for="item in categories" :key="item.label" class="flex items-center gap-1.5 text-xs">
-              <span class="h-2 w-2 rounded-full" :style="{ backgroundColor: item.color }"></span>
+              <span class="h-2 w-2 rounded-full" :style="{ backgroundColor: themeColor(item.color) }"></span>
               <span class="text-gray-500 dark:text-gray-400">{{ item.label }} {{ item.count }}</span>
             </div>
           </div>

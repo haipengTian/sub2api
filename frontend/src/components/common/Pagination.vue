@@ -82,7 +82,11 @@
           <Icon name="chevronLeft" size="md" />
         </button>
 
-        <!-- Page numbers -->
+        <span v-if="isCredit" class="credit-page-status" role="status" :aria-label="t('pagination.pageOf', { page, total: totalPages })">
+          {{ page }} / {{ totalPages }}
+        </span>
+        <!-- Other skins retain direct page-number navigation. -->
+        <template v-else>
         <button
           v-for="(pageNum, index) in visiblePages"
           :key="`${pageNum}-${index}`"
@@ -102,6 +106,7 @@
         >
           {{ pageNum }}
         </button>
+        </template>
 
         <!-- Next button -->
         <button
@@ -124,8 +129,10 @@ import Icon from '@/components/icons/Icon.vue'
 import Select from './Select.vue'
 import { getConfiguredTablePageSizeOptions, normalizeTablePageSize } from '@/utils/tablePreferences'
 import { setPersistedPageSize } from '@/composables/usePersistedPageSize'
+import { useAppearance } from '@/composables/useAppearance'
 
 const { t } = useI18n()
+const { isCredit } = useAppearance()
 
 interface Props {
   total: number
@@ -149,7 +156,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-const totalPages = computed(() => Math.ceil(props.total / props.pageSize))
+const totalPages = computed(() => Math.max(isCredit.value ? 1 : 0, Math.ceil(props.total / props.pageSize)))
 
 const fromItem = computed(() => {
   if (props.total === 0) return 0

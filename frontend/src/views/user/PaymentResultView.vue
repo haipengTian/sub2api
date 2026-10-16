@@ -1,6 +1,6 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-dark-900">
-    <div class="w-full max-w-md space-y-6">
+  <div class="payment-result-page flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-dark-900">
+    <div class="payment-result-card w-full max-w-md space-y-6">
       <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-20">
         <div class="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
@@ -91,7 +91,7 @@
           </div>
         </div>
         <!-- Actions -->
-        <div class="flex gap-3">
+        <div class="payment-result-actions flex gap-3">
           <button class="btn btn-secondary flex-1" @click="router.push('/purchase')">{{ t('payment.result.backToRecharge') }}</button>
           <button class="btn btn-primary flex-1" @click="router.push('/orders')">{{ t('payment.result.viewOrders') }}</button>
         </div>

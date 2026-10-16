@@ -1,6 +1,6 @@
 <template>
   <section
-    class="card flex min-h-[360px] flex-col overflow-hidden !rounded-3xl !border-0 !p-6 shadow-sm ring-1 ring-gray-900/5 dark:!bg-dark-800 dark:ring-dark-700"
+    class="credit-chart-panel card flex min-h-[360px] flex-col overflow-hidden !rounded-3xl !border-0 !p-6 shadow-sm ring-1 ring-gray-900/5 dark:!bg-dark-800 dark:ring-dark-700"
   >
     <div class="card-header mb-4 flex shrink-0 flex-wrap items-start justify-between gap-3 !border-0 !p-0">
       <div class="min-w-0">
@@ -16,13 +16,13 @@
       </div>
       <div class="flex w-full min-w-0 flex-wrap items-center justify-end gap-2 text-xs text-gray-500 dark:text-gray-400 sm:w-auto">
         <span class="flex shrink-0 items-center gap-1">
-          <span class="h-2 w-2 rounded-full bg-red-500"></span>{{ t('channelMonitorV2.chart.errorLegend') }}
+          <span class="h-2 w-2 rounded-full bg-red-500" :style="{ backgroundColor: themeColor('#ef4444') }"></span>{{ t('channelMonitorV2.chart.errorLegend') }}
         </span>
         <span class="flex shrink-0 items-center gap-1">
-          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>{{ t('channelMonitorV2.chart.cacheLegend') }}
+          <span class="h-2 w-2 rounded-full bg-emerald-500" :style="{ backgroundColor: themeColor('#10b981') }"></span>{{ t('channelMonitorV2.chart.cacheLegend') }}
         </span>
         <span class="flex shrink-0 items-center gap-1">
-          <span class="h-2 w-2 rounded-full bg-sky-500"></span>{{ t('channelMonitorV2.chart.ttftLegend') }}
+          <span class="h-2 w-2 rounded-full bg-sky-500" :style="{ backgroundColor: themeColor('#0ea5e9') }"></span>{{ t('channelMonitorV2.chart.ttftLegend') }}
         </span>
         <span class="badge badge-gray shrink-0">{{ bucketLabel }}</span>
         <button
@@ -45,7 +45,7 @@
         class="h-[280px] sm:h-[300px]"
         @wheel="onChartWheel"
       >
-        <Line :data="chartData" :options="chartOptions" />
+        <Line :key="chartAppearanceKey" :data="themeData('line', chartData)" :options="themeOptions('line', chartOptions)" />
       </div>
       <div v-else class="flex h-[280px] items-center justify-center sm:h-[300px]">
         <EmptyState
@@ -58,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+import { useChartAppearance } from '@/composables/useChartAppearance'
 import { useI18n } from 'vue-i18n'
 import { computed, ref, watch } from 'vue'
 import {
@@ -86,6 +87,8 @@ import {
 } from '@/features/channel-monitor-v2/monitorZoom'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
+
+const { themeData, themeOptions, themeColor, chartAppearanceKey } = useChartAppearance()
 const { t, locale } = useI18n()
 
 const props = defineProps<{

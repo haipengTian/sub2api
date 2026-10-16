@@ -1,8 +1,9 @@
 import { computed, readonly, ref } from 'vue'
 
-export type Skin = 'modern' | 'classic'
+export type Skin = 'modern' | 'classic' | 'credit'
 const skin = ref<Skin>('modern')
 const dark = ref(false)
+const fullWidth = ref(false)
 let observer: MutationObserver | undefined
 
 function read(key: string): string | null {
@@ -15,7 +16,10 @@ function save(key: string, value: string) {
 
 /** Runs before mount; the skin is independent of the existing light/dark preference. */
 export function initAppearance() {
-  skin.value = read('sub2api-skin') === 'classic' ? 'classic' : 'modern'
+  const storedSkin = read('sub2api-skin')
+  skin.value = storedSkin === 'classic' || storedSkin === 'credit' ? storedSkin : 'modern'
+  fullWidth.value = read('sub2api-credit-full-width') === 'true'
+  document.documentElement.dataset.contentWidth = fullWidth.value ? 'full' : 'contained'
   const theme = read('theme')
   dark.value = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
   document.documentElement.dataset.skin = skin.value
@@ -29,15 +33,30 @@ export function initAppearance() {
 }
 
 export function useAppearance() {
+  function toggleFullWidth() {
+    fullWidth.value = !fullWidth.value
+    document.documentElement.dataset.contentWidth = fullWidth.value ? 'full' : 'contained'
+    save('sub2api-credit-full-width', String(fullWidth.value))
+  }
+  function setSkin(value: Skin) {
+    skin.value = value
+    document.documentElement.dataset.skin = value
+    save('sub2api-skin', value)
+  }
   function toggleSkin() {
-    skin.value = skin.value === 'modern' ? 'classic' : 'modern'
-    document.documentElement.dataset.skin = skin.value
-    save('sub2api-skin', skin.value)
+    setSkin(skin.value === 'modern' ? 'classic' : 'modern')
   }
   function toggleDark() {
     dark.value = !document.documentElement.classList.contains('dark')
     document.documentElement.classList.toggle('dark', dark.value)
     save('theme', dark.value ? 'dark' : 'light')
   }
-  return { skin: readonly(skin), isModern: computed(() => skin.value === 'modern'), isDark: readonly(dark), toggleSkin, toggleDark }
+  return {
+    skin: readonly(skin),
+    isModern: computed(() => skin.value === 'modern'),
+    isCredit: computed(() => skin.value === 'credit'),
+    isEnhanced: computed(() => skin.value !== 'classic'),
+    isDark: readonly(dark), setSkin, toggleSkin, toggleDark,
+    isFullWidth: readonly(fullWidth), toggleFullWidth,
+  }
 }
