@@ -563,6 +563,7 @@ function mountView() {
         ProxySelector: true,
         ImageUpload: ImageUploadStub,
         BackupSettings: true,
+        AdminAccessKeysSettings: true,
       },
     },
   });
@@ -722,6 +723,36 @@ describe("admin SettingsView payment visible method controls", () => {
     });
     fetchPublicSettings.mockResolvedValue(undefined);
     adminSettingsFetch.mockResolvedValue(undefined);
+  });
+
+  it("keeps scoped keys in the security tab without applying the two-column legacy card layout", async () => {
+    const wrapper = mountView();
+    await flushPromises();
+    await openSecurityTab(wrapper);
+
+    const scopedKeys = wrapper.get("admin-access-keys-settings-stub");
+    expect(scopedKeys.element.closest(".settings-section")).not.toBeNull();
+    expect(scopedKeys.classes()).not.toContain("settings-card");
+    expect(wrapper.find("details").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("admin.settings.adminApiKey.create");
+    wrapper.unmount();
+  });
+
+  it("preserves legacy key rotation inside a themed header/body card", async () => {
+    getAdminApiKey.mockResolvedValue({ exists: true, masked_key: "preview-masked" });
+    const wrapper = mountView();
+    await flushPromises();
+    await openSecurityTab(wrapper);
+
+    const legacy = wrapper.get("details");
+    expect(legacy.get("summary").text()).toContain("adminAccessKeys.legacy");
+    const card = legacy.get(".settings-card");
+    expect(card.element.children).toHaveLength(2);
+    expect(card.get(".settings-card-header").exists()).toBe(true);
+    expect(card.get(".settings-card-body").text()).toContain("preview-masked");
+    expect(legacy.text()).toContain("admin.settings.adminApiKey.regenerate");
+    expect(legacy.text()).toContain("admin.settings.adminApiKey.delete");
+    wrapper.unmount();
   });
 
   it("loads and saves the open button visibility for each custom menu", async () => {
@@ -1365,6 +1396,7 @@ describe("admin SettingsView payment visible method controls", () => {
           ProxySelector: true,
           ImageUpload: ImageUploadStub,
           BackupSettings: true,
+          AdminAccessKeysSettings: true,
         },
       },
     });
@@ -1711,6 +1743,7 @@ describe("admin SettingsView payment visible method controls", () => {
           ProxySelector: true,
           ImageUpload: ImageUploadStub,
           BackupSettings: true,
+          AdminAccessKeysSettings: true,
         },
       },
     });
