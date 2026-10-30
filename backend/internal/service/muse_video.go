@@ -49,7 +49,7 @@ func ParseMuseVideoRequest(body []byte) (GrokMediaRequestInfo, error) {
 	}
 	model := gjson.GetBytes(body, "model")
 	if model.Type != gjson.String || !IsMuseVideoModel(model.String()) {
-		return info, fmt.Errorf("Muse video requires model muse-video")
+		return info, fmt.Errorf("muse video requires model muse-video")
 	}
 	prompt := gjson.GetBytes(body, "prompt")
 	if prompt.Type != gjson.String || strings.TrimSpace(prompt.String()) == "" {
@@ -119,7 +119,7 @@ func museVideoFilename(body []byte) (string, error) {
 		}
 	}
 	if filename == "" || strings.Contains(filename, "..") {
-		return "", fmt.Errorf("Muse video has no valid media filename")
+		return "", fmt.Errorf("muse video has no valid media filename")
 	}
 	if err := validateUpstreamPathSegment("Muse media filename", filename); err != nil {
 		return "", err
@@ -131,7 +131,7 @@ func museVideoFilename(body []byte) (string, error) {
 // billing machinery. Async creates are never retried after an ambiguous result.
 func (s *OpenAIGatewayService) ForwardMuseVideo(ctx context.Context, c *gin.Context, account *Account, endpoint GrokMediaEndpoint, task string, body []byte) (*OpenAIForwardResult, error) {
 	if !endpoint.IsMuseVideo() || !account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilityMuseVideo) {
-		return nil, fmt.Errorf("Muse video requires an OpenAI API key account with a custom base URL")
+		return nil, fmt.Errorf("muse video requires an OpenAI API key account with a custom base URL")
 	}
 	base, err := s.validateUpstreamBaseURL(account.GetCredential("base_url"))
 	if err != nil {
@@ -139,7 +139,7 @@ func (s *OpenAIGatewayService) ForwardMuseVideo(ctx context.Context, c *gin.Cont
 	}
 	token := strings.TrimSpace(account.GetCredential("api_key"))
 	if token == "" {
-		return nil, fmt.Errorf("Muse video account missing api_key")
+		return nil, fmt.Errorf("muse video account missing api_key")
 	}
 	started := time.Now()
 	target := buildOpenAIImagesURL(base, "/v1/videos")
@@ -152,7 +152,7 @@ func (s *OpenAIGatewayService) ForwardMuseVideo(ctx context.Context, c *gin.Cont
 		}
 		mapped := account.GetMappedModel(info.Model)
 		if !IsMuseVideoModel(mapped) {
-			return nil, fmt.Errorf("Muse video account must map muse-video to muse-video")
+			return nil, fmt.Errorf("muse video account must map muse-video to muse-video")
 		}
 		body, err = sjson.SetBytes(body, "model", "muse-video")
 		if err != nil {
@@ -194,10 +194,10 @@ func (s *OpenAIGatewayService) ForwardMuseVideo(ctx context.Context, c *gin.Cont
 	if resp.StatusCode >= 300 {
 		// Never return a Location header or follow redirects carrying credentials.
 		if resp.StatusCode < 400 {
-			return nil, fmt.Errorf("Muse video upstream redirect is not allowed")
+			return nil, fmt.Errorf("muse video upstream redirect is not allowed")
 		}
 		writeGrokMediaResponse(c, resp, responseBody, s.responseHeaderFilter)
-		return nil, fmt.Errorf("Muse video upstream status %d", resp.StatusCode)
+		return nil, fmt.Errorf("muse video upstream status %d", resp.StatusCode)
 	}
 	if !gjson.ValidBytes(responseBody) || !gjson.ParseBytes(responseBody).IsObject() {
 		return nil, fmt.Errorf("invalid Muse video response")
@@ -205,7 +205,7 @@ func (s *OpenAIGatewayService) ForwardMuseVideo(ctx context.Context, c *gin.Cont
 	if endpoint == MuseVideoEndpointCreate {
 		id := extractGrokMediaVideoRequestID(responseBody)
 		if id == "" {
-			return nil, fmt.Errorf("Muse video create response missing task ID")
+			return nil, fmt.Errorf("muse video create response missing task ID")
 		}
 		task = "muse:" + id
 		if _, err := museVideoTaskID(task); err != nil {
@@ -266,7 +266,7 @@ func (s *OpenAIGatewayService) ForwardMuseVideo(ctx context.Context, c *gin.Cont
 	}
 	defer func() { _ = mediaResp.Body.Close() }()
 	if mediaResp.StatusCode != http.StatusOK && mediaResp.StatusCode != http.StatusPartialContent && mediaResp.StatusCode != http.StatusRequestedRangeNotSatisfiable {
-		return nil, fmt.Errorf("Muse media download status %d", mediaResp.StatusCode)
+		return nil, fmt.Errorf("muse media download status %d", mediaResp.StatusCode)
 	}
 	result.Duration = time.Since(started)
 	if err := writeGrokMediaContentResponse(c, mediaResp); err != nil {
