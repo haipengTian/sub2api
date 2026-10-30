@@ -17,7 +17,7 @@
 
 界面二开见 [现代、经典与 Credit 三种风格](appearance.md)：默认现代风格，皮肤与明暗模式独立；Credit 组件与动效见 [移植说明](credit-style.md)。
 
-麦麦统一图片入口见 [通过 Sub2API 使用 Muse 生图](muse-images.md)，包含普通画图、参考图生活照和模型路由配置。
+Muse 统一入口见 [通过 Sub2API 使用 Muse 图片和视频](muse-images.md)，包含普通画图、参考图生活照、异步视频和模型路由配置。
 
 ## 每次同步
 
