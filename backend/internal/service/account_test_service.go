@@ -817,7 +817,10 @@ func (s *AccountTestService) testOpenAIAccountConnection(c *gin.Context, account
 	}
 
 	// Route to image generation test if an image model is selected
-	if isOpenAIImageModel(testModelID) {
+	if isOpenAIImageModel(testModelID) || isAPIKeyCompatibleImageModel(testModelID) {
+		if isAPIKeyCompatibleImageModel(testModelID) && account.Type != AccountTypeAPIKey {
+			return s.sendErrorAndEnd(c, "This image model requires an API Key account")
+		}
 		imagePrompt := strings.TrimSpace(prompt)
 		if imagePrompt == "" {
 			imagePrompt = defaultOpenAIImageTestPrompt

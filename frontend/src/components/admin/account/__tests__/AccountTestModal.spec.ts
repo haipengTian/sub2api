@@ -220,4 +220,23 @@ describe('AccountTestModal', () => {
       mode: 'compact'
     })
   })
+
+  it('Muse 图片账号测试会显示提示词并发送图片测试请求', async () => {
+    getAvailableModels.mockResolvedValue([{ id: 'muse-image', display_name: 'Muse Image' }])
+    const wrapper = mountModal({
+      id: 42, name: 'Muse2API', platform: 'openai', type: 'apikey', status: 'active'
+    })
+    await wrapper.setProps({ show: true })
+    await flushPromises()
+
+    const promptInput = wrapper.find('textarea.textarea-stub')
+    expect(promptInput.exists()).toBe(true)
+    await promptInput.setValue('draw a cat')
+    await (wrapper.vm as any).startTest()
+    await flushPromises()
+
+    const [, request] = (global.fetch as any).mock.calls[0]
+    expect(JSON.parse(request.body)).toMatchObject({ model_id: 'muse-image', prompt: 'draw a cat' })
+    expect(wrapper.find('img[alt="test-image-1"]').attributes('src')).toBe('data:image/png;base64,QUJD')
+  })
 })

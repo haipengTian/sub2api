@@ -1917,6 +1917,13 @@ func (a *Account) SupportsOpenAIEndpointCapability(capability OpenAIEndpointCapa
 	if a == nil {
 		return false
 	}
+	if capability == OpenAIEndpointCapabilityMuseVideo {
+		// Custom OpenAI relays are not necessarily Muse providers. Require an
+		// explicit model declaration, not the default unrestricted model policy.
+		_, declared := a.GetModelMapping()["muse-video"]
+		return a.Platform == PlatformOpenAI && a.Type == AccountTypeAPIKey &&
+			declared && strings.TrimSpace(a.GetCredential("base_url")) != "" && IsMuseVideoModel(a.GetMappedModel("muse-video"))
+	}
 	if capability == OpenAIEndpointCapabilitySeedance {
 		configured, _ := a.openAIEndpointCapabilitySet()
 		return configured["seedance"] && a.Platform == PlatformOpenAI && a.Type == AccountTypeAPIKey &&
