@@ -11,6 +11,7 @@ import (
 	"github.com/Wei-Shaw/sub2api/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
 )
 
 func TestAccountTestService_OpenAIImageOAuthHandlesOutputItemDoneFallback(t *testing.T) {
@@ -90,4 +91,47 @@ func TestAccountTestService_OpenAIImageAPIKeyUsesConfiguredV1BaseURL(t *testing.
 	require.Equal(t, "Bearer test-api-key", upstream.lastReq.Header.Get("Authorization"))
 	require.Contains(t, rec.Body.String(), "data:image/png;base64,aGVsbG8=")
 	require.Contains(t, rec.Body.String(), "\"success\":true")
+}
+
+func TestAccountTestService_MuseImageUsesImagesEndpoint(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	for _, requestedModel := range []string{"muse-image", "my-image"} {
+		t.Run(requestedModel, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(rec)
+			c.Request = httptest.NewRequest(http.MethodPost, "/api/v1/admin/accounts/1/test", nil)
+			upstream := &httpUpstreamRecorder{resp: &http.Response{
+				StatusCode: http.StatusOK,
+				Header:     http.Header{"Content-Type": {"application/json"}},
+				Body:       io.NopCloser(strings.NewReader(`{"data":[{"b64_json":"aGVsbG8="}]}`)),
+			}}
+			svc := &AccountTestService{httpUpstream: upstream, cfg: &config.Config{}}
+			account := &Account{ID: 1, Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+				Credentials: map[string]any{"api_key": "test-key", "base_url": "https://muse.example/v1",
+					"model_mapping": map[string]any{requestedModel: "muse-image"}}}
+			err := svc.testOpenAIAccountConnection(c, account, requestedModel, "draw a cat", AccountTestModeDefault)
+			require.NoError(t, err)
+			require.Equal(t, "https://muse.example/v1/images/generations", upstream.lastReq.URL.String())
+			require.Equal(t, "muse-image", gjson.GetBytes(upstream.lastBody, "model").String())
+			require.Equal(t, "draw a cat", gjson.GetBytes(upstream.lastBody, "prompt").String())
+			require.Equal(t, "b64_json", gjson.GetBytes(upstream.lastBody, "response_format").String())
+			require.Contains(t, rec.Body.String(), "data:image/png;base64,aGVsbG8=")
+			require.Contains(t, rec.Body.String(), `"success":true`)
+		})
+	}
+}
+
+func TestAccountTestService_MuseImageRejectsOAuth(t *testing.T) {
+	for _, typ := range []string{AccountTypeOAuth, AccountTypeSetupToken} {
+		t.Run(typ, func(t *testing.T) {
+			c, _ := gin.CreateTestContext(httptest.NewRecorder())
+			c.Request = httptest.NewRequest(http.MethodPost, "/api/v1/admin/accounts/1/test", nil)
+			upstream := &httpUpstreamRecorder{}
+			svc := &AccountTestService{httpUpstream: upstream, cfg: &config.Config{}}
+			account := &Account{Platform: PlatformOpenAI, Type: typ}
+			err := svc.testOpenAIAccountConnection(c, account, "muse-image", "draw", AccountTestModeDefault)
+			require.ErrorContains(t, err, "API Key")
+			require.Empty(t, upstream.requests)
+		})
+	}
 }

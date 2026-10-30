@@ -189,4 +189,22 @@ describe('AccountTestModal', () => {
 
     expect(wrapper.text()).toContain('已通过 /v1/chat/completions 验证')
   })
+
+  it('shows the image prompt and sends it for a Muse API Key account', async () => {
+    getAvailableModelsMock.mockResolvedValue([{ id: 'muse-image', display_name: 'Muse Image' }])
+    const wrapper = mount(AccountTestModal, {
+      props: { show: false, account: { ...buildAccount(), type: 'apikey' } },
+      global: {
+        stubs: { BaseDialog: BaseDialogStub, Select: SelectStub, TextArea: TextAreaStub, Icon: true }
+      }
+    })
+    await wrapper.setProps({ show: true })
+    await flushPromises()
+    expect(wrapper.find('textarea').exists()).toBe(true)
+    await wrapper.find('textarea').setValue('draw a cat')
+    await (wrapper.vm as any).startTest()
+    await flushPromises()
+    const [, options] = (global.fetch as any).mock.calls[0]
+    expect(JSON.parse(options.body)).toMatchObject({ model_id: 'muse-image', prompt: 'draw a cat' })
+  })
 })

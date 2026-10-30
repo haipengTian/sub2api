@@ -447,6 +447,9 @@ const supportsGeminiImageTest = computed(() => {
 
 const supportsOpenAIImageTest = computed(() => {
   const modelID = selectedModelId.value.toLowerCase()
+  if (modelID === 'muse-image' && props.account?.type === 'apikey') {
+    return props.account.platform === 'openai'
+  }
   if (!modelID.startsWith('gpt-image-')) return false
   return props.account?.platform === 'openai'
 })
