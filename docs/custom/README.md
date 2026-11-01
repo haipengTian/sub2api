@@ -5,7 +5,7 @@
 
 ## 当前基线
 
-个人 `v0.2.19-custom.2` 已发布，镜像为 `ghcr.io/haipengtian/sub2api:0.2.19-custom.2`。本次准备发布 `v0.2.19-custom.3`，补齐 Muse 视频账号测试界面，见 [发布记录](releases/0.2.19-custom.3.md)。
+个人 `v0.2.19-custom.3` 已发布，镜像为 `ghcr.io/haipengtian/sub2api:0.2.19-custom.3`，支持 Linux amd64 / arm64，补齐 Muse 视频账号测试界面，见 [发布记录](releases/0.2.19-custom.3.md)。
 官方稳定基线仍为 `v0.2.19`，保留现代、经典、Credit 三套皮肤及 custom 更新、发布通道；基线迁移和升级影响见 [版本记录](releases/0.2.19-custom.1.md)，图片与视频网关见 [Muse 接入版本](releases/0.2.19-custom.2.md)。后续以明确的官方稳定 tag 为融合目标，不以仓库当前分支名代替发布记录。
 官方远程为 `upstream`，个人远程为 `origin`。
 
