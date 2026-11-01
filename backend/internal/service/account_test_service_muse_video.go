@@ -124,7 +124,7 @@ func (s *AccountTestService) museAccountTestRequest(ctx context.Context, account
 		return nil, "", fmt.Errorf("muse response exceeds preview size limit")
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, "", fmt.Errorf("Muse API returned %d: %s", resp.StatusCode, sanitizeUpstreamErrorMessage(truncateString(string(body), 500)))
+		return nil, "", fmt.Errorf("muse API returned %d: %s", resp.StatusCode, sanitizeUpstreamErrorMessage(truncateString(string(body), 500)))
 	}
 	return body, resp.Header.Get("Content-Type"), nil
 }
