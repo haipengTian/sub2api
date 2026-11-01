@@ -113,15 +113,15 @@ func (s *AccountTestService) museAccountTestRequest(ctx context.Context, account
 	account.ApplyHeaderOverrides(req.Header)
 	resp, err := s.httpUpstream.Do(req, s.grokTestProxyURL(account), account.ID, account.Concurrency)
 	if err != nil {
-		return nil, "", fmt.Errorf("Muse request failed: %s", sanitizeUpstreamErrorMessage(err.Error()))
+		return nil, "", fmt.Errorf("muse request failed: %s", sanitizeUpstreamErrorMessage(err.Error()))
 	}
 	defer func() { _ = resp.Body.Close() }()
 	body, err := io.ReadAll(io.LimitReader(resp.Body, limit+1))
 	if err != nil {
-		return nil, "", fmt.Errorf("Failed to read Muse response: %w", err)
+		return nil, "", fmt.Errorf("failed to read Muse response: %w", err)
 	}
 	if int64(len(body)) > limit {
-		return nil, "", fmt.Errorf("Muse response exceeds preview size limit")
+		return nil, "", fmt.Errorf("muse response exceeds preview size limit")
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return nil, "", fmt.Errorf("Muse API returned %d: %s", resp.StatusCode, sanitizeUpstreamErrorMessage(truncateString(string(body), 500)))
