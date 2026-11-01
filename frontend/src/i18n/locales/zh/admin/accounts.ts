@@ -1753,6 +1753,12 @@ export default {
       videoTestHint:
         '调用独立 /v1/videos/generations，轮询至完成后下载成品视频并在页面上预览。',
       videoTestMode: '模式：视频生成测试',
+      museVideoTestHint: '生成约 6 秒视频，轮询进度并预览。会消耗上游额度；关闭窗口不会取消已提交任务。',
+      museVideoProgress: '视频生成进度',
+      museVideoQueued: '排队中',
+      museVideoProcessing: '视频生成中',
+      museVideoCompleted: '生成完成',
+      museVideoStreamEnded: '测试连接已中断，尚未确认生成结果。上游任务可能仍在运行，请勿重复提交。',
       sendingVideoRequest: '正在发送视频生成测试请求...',
       imagePreview: '生成结果：',
       imageReceived: '已收到第 {count} 张测试图片',

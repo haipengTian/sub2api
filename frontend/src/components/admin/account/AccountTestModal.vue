@@ -70,7 +70,7 @@
         />
       </div>
 
-      <div v-if="isOpenAIAccount" class="space-y-1.5">
+      <div v-if="isOpenAIAccount && !supportsMuseVideoTest" class="space-y-1.5">
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
           {{ t('admin.accounts.openai.testMode') }}
         </label>
@@ -170,6 +170,8 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.grok.audioUploadHint') }}</p>
       </div>
 
+      <AccountTestVideoProgress v-if="museVideoTask" :task="museVideoTask" />
+
       <!-- Terminal Output -->
       <div class="group relative">
         <div
@@ -183,7 +185,7 @@
           </div>
           <div v-else-if="status === 'connecting'" class="flex items-center gap-2 text-yellow-400">
             <Icon name="refresh" size="sm" class="animate-spin" :stroke-width="2" />
-            <span>{{ t('admin.accounts.connectingToApi') }}</span>
+            <span>{{ supportsMuseVideoTest && museVideoTask ? t('admin.accounts.museVideoProgress') : t('admin.accounts.connectingToApi') }}</span>
           </div>
 
           <!-- Output Lines -->
@@ -264,7 +266,7 @@
         </div>
       </div>
 
-      <div v-if="generatedVideos.length > 0" class="space-y-2">
+      <div v-if="generatedVideos.length > 0" ref="videoPreviewRef" class="space-y-2">
         <div class="text-xs font-medium text-gray-600 dark:text-gray-300">
           {{ t('admin.accounts.videoPreview') }}
         </div>
@@ -365,7 +367,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, nextTick } from 'vue'
+import { computed, ref, watch, nextTick, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import Select from '@/components/common/Select.vue'
@@ -375,6 +377,8 @@ import { useClipboard } from '@/composables/useClipboard'
 import { buildApiUrl } from '@/api/client'
 import { ADMIN_UI_REQUEST_HEADER } from '@/api/adminUIRequest'
 import { adminAPI } from '@/api/admin'
+import AccountTestVideoProgress from '@/components/account/AccountTestVideoProgress.vue'
+import { useMuseVideoAccountTest } from '@/composables/useMuseVideoAccountTest'
 import type { Account, ClaudeModel } from '@/types'
 
 const { t } = useI18n()
@@ -400,12 +404,14 @@ const emit = defineEmits<{
 }>()
 
 const terminalRef = ref<HTMLElement | null>(null)
+const videoPreviewRef = ref<HTMLElement | null>(null)
 const status = ref<'idle' | 'connecting' | 'success' | 'error'>('idle')
 const outputLines = ref<OutputLine[]>([])
 const streamingContent = ref('')
 const errorMessage = ref('')
 const availableModels = ref<ClaudeModel[]>([])
 const selectedModelId = ref('')
+const { supported: supportsMuseVideoTest, task: museVideoTask, updateTask: updateMuseVideoTask } = useMuseVideoAccountTest(() => props.account, selectedModelId)
 const testPrompt = ref('')
 const loadingModels = ref(false)
 let abortController: AbortController | null = null
@@ -501,7 +507,7 @@ const modelOptionsForMode = computed(() => {
 
 const supportsPromptInput = computed(() => {
   if (!isGrokAccount.value) {
-    return supportsImageTest.value
+    return supportsImageTest.value || supportsMuseVideoTest.value
   }
   return (
     grokTestMode.value === 'image' ||
@@ -512,17 +518,17 @@ const supportsPromptInput = computed(() => {
 })
 
 const supportsImageUpload = computed(
-  () => isGrokAccount.value && (grokTestMode.value === 'image' || grokTestMode.value === 'video')
+  () => supportsMuseVideoTest.value || (isGrokAccount.value && (grokTestMode.value === 'image' || grokTestMode.value === 'video'))
 )
 const supportsAudioUpload = computed(() => isGrokAccount.value && grokTestMode.value === 'stt')
 const imageUploadLabel = computed(() =>
-  grokTestMode.value === 'video'
+  supportsMuseVideoTest.value || grokTestMode.value === 'video'
     ? t('admin.accounts.grok.videoFirstFrameLabel')
     : t('admin.accounts.grok.imageUploadLabel')
 )
 
 const imageUploadHint = computed(() =>
-  grokTestMode.value === 'video'
+  supportsMuseVideoTest.value || grokTestMode.value === 'video'
     ? t('admin.accounts.grok.videoFirstFrameHint')
     : t('admin.accounts.grok.imageUploadHint')
 )
@@ -600,7 +606,7 @@ const clearMediaUploads = () => {
 }
 
 const promptInputLabel = computed(() => {
-  if (supportsGrokVideoTest.value || grokTestMode.value === 'video') {
+  if (supportsMuseVideoTest.value || supportsGrokVideoTest.value || grokTestMode.value === 'video') {
     return t('admin.accounts.videoPromptLabel')
   }
   if (supportsImageTest.value || grokTestMode.value === 'image') {
@@ -616,7 +622,7 @@ const promptInputLabel = computed(() => {
 })
 
 const promptInputPlaceholder = computed(() => {
-  if (grokTestMode.value === 'video') {
+  if (supportsMuseVideoTest.value || grokTestMode.value === 'video') {
     return t('admin.accounts.videoPromptPlaceholder')
   }
   if (grokTestMode.value === 'image' || supportsImageTest.value) {
@@ -632,6 +638,7 @@ const promptInputPlaceholder = computed(() => {
 })
 
 const promptInputHint = computed(() => {
+  if (supportsMuseVideoTest.value) return t('admin.accounts.museVideoTestHint')
   if (grokTestMode.value === 'video') {
     return t('admin.accounts.videoTestHint')
   }
@@ -654,6 +661,7 @@ const promptInputHint = computed(() => {
 })
 
 const testModeSummary = computed(() => {
+  if (supportsMuseVideoTest.value) return t('admin.accounts.videoTestMode')
   if (isGrokAccount.value) {
     switch (grokTestMode.value) {
       case 'video':
@@ -707,7 +715,7 @@ const sortTestModels = (models: ClaudeModel[]) => {
 const applyDefaultPromptForMode = () => {
   if (!supportsPromptInput.value) return
   if (testPrompt.value.trim()) return
-  if (grokTestMode.value === 'video') {
+  if (supportsMuseVideoTest.value || grokTestMode.value === 'video') {
     testPrompt.value = t('admin.accounts.videoPromptDefault')
   } else if (grokTestMode.value === 'image' || supportsImageTest.value) {
     testPrompt.value = t('admin.accounts.imagePromptDefault')
@@ -737,9 +745,11 @@ const pickDefaultModelForMode = () => {
 }
 
 watch(
-  () => props.show,
-  async (newVal) => {
-    if (newVal && props.account) {
+  [() => props.show, () => props.account?.id],
+  async ([show]) => {
+    abortStream()
+    clearMediaUploads()
+    if (show && props.account) {
       testPrompt.value = ''
       testMode.value = 'default'
       grokTestMode.value = 'text'
@@ -762,6 +772,15 @@ watch(grokTestMode, () => {
   pickDefaultModelForMode()
   applyDefaultPromptForMode()
 })
+
+watch(selectedModelId, () => {
+  if ([t('admin.accounts.imagePromptDefault'), t('admin.accounts.videoPromptDefault')].includes(testPrompt.value)) testPrompt.value = ''
+  if (supportsMuseVideoTest.value) testMode.value = 'default'
+  museVideoTask.value = null
+  applyDefaultPromptForMode()
+})
+
+onUnmounted(() => abortStream())
 
 const loadAvailableModels = async () => {
   if (!props.account) return
@@ -801,6 +820,7 @@ const resetState = () => {
   generatedImages.value = []
   generatedAudios.value = []
   generatedVideos.value = []
+  museVideoTask.value = null
   previewImageUrl.value = ''
 }
 
@@ -844,7 +864,8 @@ const startTest = async () => {
 
   abortStream()
 
-  abortController = new AbortController()
+  const controller = new AbortController()
+  abortController = controller
 
   try {
     const requestBody: {
@@ -858,7 +879,10 @@ const startTest = async () => {
       prompt: supportsPromptInput.value ? testPrompt.value.trim() : ''
     }
     if (isOpenAIAccount.value) {
-      requestBody.mode = testMode.value
+      requestBody.mode = supportsMuseVideoTest.value ? 'default' : testMode.value
+    }
+    if (supportsMuseVideoTest.value && uploadImageDataURL.value) {
+      requestBody.image_data_url = uploadImageDataURL.value
     }
     if (isGrokAccount.value) {
       // Always send explicit Grok mode. search/tts/stt/realtime are standalone
@@ -892,7 +916,7 @@ const startTest = async () => {
         [ADMIN_UI_REQUEST_HEADER]: '1'
       },
       body: JSON.stringify(requestBody),
-      signal: abortController.signal
+      signal: controller.signal
     })
 
     if (!response.ok) {
@@ -909,6 +933,7 @@ const startTest = async () => {
 
     while (true) {
       const { done, value } = await reader.read()
+      if (controller.signal.aborted) return
       if (done) break
 
       buffer += decoder.decode(value, { stream: true })
@@ -929,9 +954,11 @@ const startTest = async () => {
         }
       }
     }
+    if (supportsMuseVideoTest.value && status.value === 'connecting' && !controller.signal.aborted) {
+      throw new Error(t('admin.accounts.museVideoStreamEnded'))
+    }
   } catch (error: unknown) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      status.value = 'idle'
+    if (controller.signal.aborted) {
       return
     }
     status.value = 'error'
@@ -951,6 +978,8 @@ const handleEvent = (event: {
   audio_url?: string
   video_url?: string
   mime_type?: string
+  status?: string
+  data?: { task_id?: string; progress?: number }
 }) => {
   switch (event.type) {
     case 'test_start':
@@ -973,6 +1002,8 @@ const handleEvent = (event: {
                     : grokTestMode.value === 'realtime'
                       ? t('admin.accounts.grok.sendingRealtimeRequest')
                       : t('admin.accounts.sendingTestMessage')
+          : supportsMuseVideoTest.value
+            ? t('admin.accounts.sendingVideoRequest')
           : supportsImageTest.value
             ? t('admin.accounts.sendingImageRequest')
             : t('admin.accounts.sendingTestMessage'),
@@ -1016,10 +1047,12 @@ const handleEvent = (event: {
           mimeType: event.mime_type
         })
         addLine(t('admin.accounts.videoReceived', { count: generatedVideos.value.length }), 'text-purple-300')
+        nextTick(() => videoPreviewRef.value?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' }))
       }
       break
 
     case 'status':
+      updateMuseVideoTask(event)
       if (event.text) {
         addLine(event.text, 'text-cyan-300')
       }

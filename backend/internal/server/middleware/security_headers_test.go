@@ -17,6 +17,25 @@ func init() {
 	gin.SetMode(gin.TestMode)
 }
 
+func TestSecurityHeadersAllowsInlineAccountTestVideo(t *testing.T) {
+	for _, policy := range []string{"", "default-src 'self'", "default-src 'self'; media-src 'self' https://media.example.com"} {
+		t.Run(policy, func(t *testing.T) {
+			router := gin.New()
+			router.Use(SecurityHeaders(config.CSPConfig{Enabled: true, Policy: policy}, nil))
+			router.GET("/admin/accounts", func(c *gin.Context) { c.Status(http.StatusOK) })
+			rec := httptest.NewRecorder()
+			router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/admin/accounts", nil))
+			csp := rec.Header().Get("Content-Security-Policy")
+			require.Equal(t, 1, countDirectiveValue(csp, "media-src", "data:"))
+			require.Equal(t, 1, countDirectiveValue(csp, "media-src", "'self'"))
+			require.Zero(t, countDirectiveValue(csp, "script-src", "data:"))
+			if strings.Contains(policy, "media.example.com") {
+				require.Contains(t, csp, "https://media.example.com")
+			}
+		})
+	}
+}
+
 func TestGenerateNonce(t *testing.T) {
 	t.Run("generates_valid_base64_string", func(t *testing.T) {
 		nonce, err := GenerateNonce()

@@ -55,7 +55,7 @@
         />
       </div>
 
-      <div v-if="isOpenAIAccount" class="space-y-1.5">
+      <div v-if="isOpenAIAccount && !supportsMuseVideoTest" class="space-y-1.5">
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
           {{ t('admin.accounts.openai.testMode') }}
         </label>
@@ -66,16 +66,18 @@
         />
       </div>
 
-      <div v-if="supportsImageTest" class="space-y-1.5">
+      <div v-if="supportsImageTest || supportsMuseVideoTest" class="space-y-1.5">
         <TextArea
           v-model="testPrompt"
-          :label="t('admin.accounts.imagePromptLabel')"
-          :placeholder="t('admin.accounts.imagePromptPlaceholder')"
-          :hint="t('admin.accounts.imageTestHint')"
+          :label="supportsMuseVideoTest ? t('admin.accounts.videoPromptLabel') : t('admin.accounts.imagePromptLabel')"
+          :placeholder="supportsMuseVideoTest ? t('admin.accounts.videoPromptPlaceholder') : t('admin.accounts.imagePromptPlaceholder')"
+          :hint="supportsMuseVideoTest ? t('admin.accounts.museVideoTestHint') : t('admin.accounts.imageTestHint')"
           :disabled="status === 'connecting'"
           rows="3"
         />
       </div>
+
+      <AccountTestVideoProgress v-if="museVideoTask" :task="museVideoTask" />
 
       <!-- Terminal Output -->
       <div class="group relative">
@@ -90,7 +92,7 @@
           </div>
           <div v-else-if="status === 'connecting'" class="flex items-center gap-2 text-yellow-400">
             <Icon name="refresh" size="sm" class="animate-spin" :stroke-width="2" />
-            <span>{{ t('admin.accounts.connectingToApi') }}</span>
+            <span>{{ supportsMuseVideoTest && museVideoTask ? t('admin.accounts.museVideoProgress') : t('admin.accounts.connectingToApi') }}</span>
           </div>
 
           <!-- Output Lines -->
@@ -153,6 +155,13 @@
         </div>
       </div>
 
+      <div v-if="generatedVideos.length" ref="videoPreviewRef" class="space-y-2">
+        <div class="text-xs font-medium text-gray-600 dark:text-gray-300">{{ t('admin.accounts.videoPreview') }}</div>
+        <div v-for="(video, index) in generatedVideos" :key="index" class="overflow-hidden rounded-xl border border-gray-200 bg-black dark:border-dark-500">
+          <video :src="video.url" controls class="max-h-[360px] w-full" />
+        </div>
+      </div>
+
       <!-- Image Lightbox -->
       <Teleport to="body">
         <Transition name="fade">
@@ -187,7 +196,9 @@
         <span class="flex items-center gap-1">
           <Icon name="chat" size="sm" :stroke-width="2" />
           {{
-            supportsImageTest
+            supportsMuseVideoTest
+              ? t('admin.accounts.videoTestMode')
+              : supportsImageTest
               ? t('admin.accounts.imageTestMode')
               : t('admin.accounts.testPrompt')
           }}
@@ -242,7 +253,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, nextTick } from 'vue'
+import { computed, ref, watch, nextTick, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import Select from '@/components/common/Select.vue'
@@ -251,6 +262,8 @@ import { Icon } from '@/components/icons'
 import { useClipboard } from '@/composables/useClipboard'
 import { buildApiUrl } from '@/api/client'
 import { adminAPI } from '@/api/admin'
+import AccountTestVideoProgress from './AccountTestVideoProgress.vue'
+import { useMuseVideoAccountTest } from '@/composables/useMuseVideoAccountTest'
 import type { Account, ClaudeModel } from '@/types'
 
 const { t } = useI18n()
@@ -276,16 +289,19 @@ const emit = defineEmits<{
 }>()
 
 const terminalRef = ref<HTMLElement | null>(null)
+const videoPreviewRef = ref<HTMLElement | null>(null)
 const status = ref<'idle' | 'connecting' | 'success' | 'error'>('idle')
 const outputLines = ref<OutputLine[]>([])
 const streamingContent = ref('')
 const errorMessage = ref('')
 const availableModels = ref<ClaudeModel[]>([])
 const selectedModelId = ref('')
+const { supported: supportsMuseVideoTest, task: museVideoTask, updateTask: updateMuseVideoTask } = useMuseVideoAccountTest(() => props.account, selectedModelId)
 const testPrompt = ref('')
 const loadingModels = ref(false)
 let abortController: AbortController | null = null
 const generatedImages = ref<PreviewImage[]>([])
+const generatedVideos = ref<PreviewImage[]>([])
 const testMode = ref<'default' | 'compact'>('default')
 const isOpenAIAccount = computed(() => props.account?.platform === 'openai')
 const openAITestModeOptions = computed(() => [
@@ -325,9 +341,10 @@ const sortTestModels = (models: ClaudeModel[]) => {
 
 // Load available models when modal opens
 watch(
-  () => props.show,
-  async (newVal) => {
-    if (newVal && props.account) {
+  [() => props.show, () => props.account?.id],
+  async ([show]) => {
+    abortStream()
+    if (show && props.account) {
       testPrompt.value = ''
       testMode.value = 'default'
       resetState()
@@ -339,10 +356,18 @@ watch(
 )
 
 watch(selectedModelId, () => {
+  if ([t('admin.accounts.imagePromptDefault'), t('admin.accounts.videoPromptDefault')].includes(testPrompt.value)) testPrompt.value = ''
+  museVideoTask.value = null
+  if (supportsMuseVideoTest.value) {
+    testMode.value = 'default'
+    if (!testPrompt.value.trim()) testPrompt.value = t('admin.accounts.videoPromptDefault')
+  }
   if (supportsImageTest.value && !testPrompt.value.trim()) {
     testPrompt.value = t('admin.accounts.imagePromptDefault')
   }
 })
+
+onUnmounted(() => abortStream())
 
 const loadAvailableModels = async () => {
   if (!props.account) return
@@ -380,6 +405,8 @@ const resetState = () => {
   streamingContent.value = ''
   errorMessage.value = ''
   generatedImages.value = []
+  generatedVideos.value = []
+  museVideoTask.value = null
   previewImageUrl.value = ''
 }
 
@@ -408,7 +435,7 @@ const scrollToBottom = async () => {
 }
 
 const startTest = async () => {
-  if (!props.account || !selectedModelId.value) return
+  if (!props.account || !selectedModelId.value || status.value === 'connecting') return
 
   resetState()
   status.value = 'connecting'
@@ -418,7 +445,8 @@ const startTest = async () => {
 
   abortStream()
 
-  abortController = new AbortController()
+  const controller = new AbortController()
+  abortController = controller
 
   try {
     // Use the configured API base; EventSource does not support POST.
@@ -433,10 +461,10 @@ const startTest = async () => {
       },
       body: JSON.stringify({
         model_id: selectedModelId.value,
-        prompt: supportsImageTest.value ? testPrompt.value.trim() : '',
-        mode: isOpenAIAccount.value ? testMode.value : 'default'
+        prompt: supportsImageTest.value || supportsMuseVideoTest.value ? testPrompt.value.trim() : '',
+        mode: isOpenAIAccount.value && !supportsMuseVideoTest.value ? testMode.value : 'default'
       }),
-      signal: abortController.signal
+      signal: controller.signal
     })
 
     if (!response.ok) {
@@ -453,6 +481,7 @@ const startTest = async () => {
 
     while (true) {
       const { done, value } = await reader.read()
+      if (controller.signal.aborted) return
       if (done) break
 
       buffer += decoder.decode(value, { stream: true })
@@ -473,9 +502,11 @@ const startTest = async () => {
         }
       }
     }
+    if (supportsMuseVideoTest.value && status.value === 'connecting' && !controller.signal.aborted) {
+      throw new Error(t('admin.accounts.museVideoStreamEnded'))
+    }
   } catch (error: unknown) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      status.value = 'idle'
+    if (controller.signal.aborted) {
       return
     }
     status.value = 'error'
@@ -492,7 +523,10 @@ const handleEvent = (event: {
   success?: boolean
   error?: string
   image_url?: string
+  video_url?: string
   mime_type?: string
+  status?: string
+  data?: { task_id?: string; progress?: number }
 }) => {
   switch (event.type) {
     case 'test_start':
@@ -501,7 +535,9 @@ const handleEvent = (event: {
         addLine(t('admin.accounts.usingModel', { model: event.model }), 'text-cyan-400')
       }
       addLine(
-        supportsImageTest.value
+        supportsMuseVideoTest.value
+            ? t('admin.accounts.sendingVideoRequest')
+          : supportsImageTest.value
             ? t('admin.accounts.sendingImageRequest')
             : t('admin.accounts.sendingTestMessage'),
         'text-gray-400'
@@ -518,8 +554,17 @@ const handleEvent = (event: {
       break
 
     case 'status':
+      updateMuseVideoTask(event)
       if (event.text) {
         addLine(event.text, 'text-cyan-300')
+      }
+      break
+
+    case 'video':
+      if (event.video_url) {
+        generatedVideos.value.push({ url: event.video_url, mimeType: event.mime_type })
+        addLine(t('admin.accounts.videoReceived', { count: generatedVideos.value.length }), 'text-purple-300')
+        nextTick(() => videoPreviewRef.value?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' }))
       }
       break
 

@@ -1665,6 +1665,12 @@ export default {
       videoTestHint:
         'Calls standalone /v1/videos/generations, polls until done, then downloads the finished video for on-page preview.',
       videoTestMode: 'Mode: Video generation test',
+      museVideoTestHint: 'Generate an approximately 6-second video, track progress, and preview. Uses upstream quota; closing this dialog does not cancel the submitted task.',
+      museVideoProgress: 'Video generation progress',
+      museVideoQueued: 'Queued',
+      museVideoProcessing: 'Generating video',
+      museVideoCompleted: 'Generation complete',
+      museVideoStreamEnded: 'The test connection ended before the result was confirmed. The upstream task may still be running; do not submit again.',
       sendingVideoRequest: 'Sending video generation request...',
       imagePreview: 'Generated images:',
       imageReceived: 'Received test image #{count}',
