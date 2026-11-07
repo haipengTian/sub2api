@@ -1,13 +1,19 @@
 {
-  "upstream_tag": "v0.2.16",
-  "upstream_sha": "01842576b3d5c1e2545b5a99ad555d36e28ed306",
-  "base_sha": "b6085cfebc584c015237f2dc74bf26a48a25bd65",
-  "branch": "codex/sync-v0.2.16-custom.1-38434349865-1",
-  "tag": "v0.2.16-custom.1",
-  "status": "published",
-  "conflicts": [],
-  "candidate_sha": "345267082d12bae86ae9c84781e224aad6c7ebf8",
-  "checked_at": "2026-10-13T17:16:46.138863+00:00",
-  "run_id": "38434349865",
-  "run_url": "https://github.com/haipengTian/sub2api/actions/runs/38434349865"
+  "upstream_tag": "v0.2.20",
+  "upstream_sha": "dab829a4e9b7d1cc307189aea8b0319eb29e29d0",
+  "base_sha": "2bbe9f96cb20a15320894d098fafdbe61104aab3",
+  "branch": "codex/sync-v0.2.20-custom.1-42376190917-1",
+  "tag": "v0.2.20-custom.1",
+  "status": "conflict",
+  "conflicts": [
+    ".gitignore",
+    "backend/internal/service/account_test_service_openai_image_test.go",
+    "frontend/package.json",
+    "frontend/pnpm-lock.yaml",
+    "frontend/src/components/payment/__tests__/SubscriptionPlanCard.spec.ts"
+  ],
+  "candidate_sha": "8198944db1d9e488d8436dc166f321c2aa6ef04a",
+  "checked_at": "2026-11-07T13:16:36.612915+00:00",
+  "run_id": "42376190917",
+  "run_url": "https://github.com/haipengTian/sub2api/actions/runs/42376190917"
 }
