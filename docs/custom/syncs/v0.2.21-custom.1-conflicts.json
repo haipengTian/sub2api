@@ -1,0 +1,16 @@
+{
+  "upstream_tag": "v0.2.21",
+  "upstream_sha": "10ba8f9b4dc2e6023d4a9879ab77b21841babd10",
+  "base_sha": "2bbe9f96cb20a15320894d098fafdbe61104aab3",
+  "branch": "codex/sync-v0.2.21-custom.1-42974392100-1",
+  "tag": "v0.2.21-custom.1",
+  "status": "conflict",
+  "conflicts": [
+    ".gitignore",
+    "backend/internal/service/account_test_service_openai_image_test.go",
+    "frontend/package.json",
+    "frontend/pnpm-lock.yaml",
+    "frontend/src/components/payment/__tests__/SubscriptionPlanCard.spec.ts",
+    "frontend/src/views/admin/SettingsView.vue"
+  ]
+}
