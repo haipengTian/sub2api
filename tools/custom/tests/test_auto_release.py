@@ -200,6 +200,79 @@ class CoordinatorTests(GitFixture):
         self.assertEqual(self.outputs_mock.call_args.kwargs['tag'], 'v0.2.16-custom.1')
         self.assertEqual(self.remote_git('tag', '--list', '*custom*'), 'v0.2.16-custom.1')
 
+    def test_manual_publication_clears_stale_conflict_state(self):
+        self.assertEqual(self.merge(), [])
+        candidate = self.git('rev-parse', 'HEAD')
+        self.git('push', 'origin', 'HEAD:main')
+        self.load_state_mock.return_value = ({'status': 'conflict', 'conflicts': ['app.txt']}, None)
+        self.api_mock.side_effect = [
+            {'tag_name': 'v0.2.16', 'draft': False, 'prerelease': False},
+            {'tag_name': 'v0.2.16-custom.1', 'draft': False, 'prerelease': True},
+        ]
+        mod.prepare(self.root)
+        state = self.save_state_mock.call_args.args[0]
+        self.assertEqual(state['status'], 'published')
+        self.assertEqual(state['candidate_sha'], candidate)
+        self.assertEqual(state['conflicts'], [])
+        self.assertEqual(self.outputs_mock.call_args.kwargs['ready'], 'false')
+
+    def test_unpublished_manual_fusion_waits_for_release(self):
+        self.assertEqual(self.merge(), [])
+        self.git('push', 'origin', 'HEAD:main')
+        for release in (None, {'draft': True}):
+            with self.subTest(release=release):
+                self.api_mock.side_effect = [
+                    {'tag_name': 'v0.2.16', 'draft': False, 'prerelease': False}, release,
+                ]
+                mod.prepare(self.root)
+                self.assertEqual(self.save_state_mock.call_args.args[0]['status'], 'waiting')
+                self.assertEqual(self.outputs_mock.call_args.kwargs['ready'], 'false')
+
+    def test_version_number_without_official_history_is_rejected(self):
+        self.write('backend/cmd/server/VERSION', '0.2.16-custom.1\n')
+        self.commit('version only')
+        self.git('push', 'origin', 'main')
+        with self.assertRaises(subprocess.CalledProcessError):
+            mod.prepare(self.root)
+        self.save_state_mock.assert_not_called()
+        self.outputs_mock.assert_not_called()
+
+    def test_unchanged_published_state_does_not_create_another_status_commit(self):
+        self.assertEqual(self.merge(), [])
+        candidate = self.git('rev-parse', 'HEAD')
+        self.git('push', 'origin', 'HEAD:main')
+        self.load_state_mock.return_value = ({
+            'upstream_tag': 'v0.2.16', 'upstream_sha': self.official,
+            'base_sha': candidate, 'candidate_sha': candidate,
+            'tag': 'v0.2.16-custom.1', 'status': 'published', 'conflicts': [],
+        }, None)
+        self.api_mock.side_effect = [
+            {'tag_name': 'v0.2.16', 'draft': False, 'prerelease': False},
+            {'draft': False, 'prerelease': True},
+        ]
+        mod.prepare(self.root)
+        self.save_state_mock.assert_not_called()
+        self.assertEqual(self.outputs_mock.call_args.kwargs['ready'], 'false')
+
+    def test_periodic_check_preserves_failed_publication_for_manual_retry(self):
+        mod.prepare(self.root)
+        state = self.save_state_mock.call_args.args[0].copy()
+        candidate = state['candidate_sha']
+        mod.promote(self.root, self.personal, candidate, state['tag'])
+        state['status'] = 'publish_failed'
+        self.load_state_mock.return_value = (state, None)
+        self.save_state_mock.reset_mock()
+        self.api_mock.side_effect = [
+            {'tag_name': 'v0.2.16', 'draft': False, 'prerelease': False}, None,
+        ]
+        mod.prepare(self.root)
+        self.save_state_mock.assert_not_called()
+        self.assertEqual(self.outputs_mock.call_args.kwargs['ready'], 'false')
+        self.api_mock.side_effect = None
+        self.api_mock.return_value = {'tag_name': 'v0.2.16', 'draft': False, 'prerelease': False}
+        mod.prepare(self.root, retry=True)
+        self.assertEqual(self.outputs_mock.call_args.kwargs['resume'], 'true')
+
 
 if __name__ == '__main__':
     unittest.main()
