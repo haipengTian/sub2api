@@ -18,6 +18,12 @@ https://github.com/haipengTian/sub2api/actions/workflows/custom-auto-sync.yml
 
 状态文件位于 `codex/custom-sync-state` 分支的 `custom-sync.json`，包含官方/个人 SHA、候选分支、目标标签、冲突文件和运行链接。不要把状态文件复制进 main。
 
+## 新模型与工作流恢复
+
+定时流程跟踪官方稳定 Release。新模型若先在官方 main 适配、尚未随稳定版发布，可由维护者使用现有手工融合流程选择已审查的完整提交 SHA，完成验证和 custom 发布；这不改变之后跟踪稳定版的策略。
+
+若 Actions 页面提示 `Workflows on this fork have been disabled`，定时检查和发布都不会执行。在仓库 Actions 页面恢复现有工作流后，手动运行一次 `Custom upstream fusion and release`，确认状态文件和运行结果。恢复开关不会解决代码冲突；冲突仍需按报告人工处理。
+
 ## 页面与失败处理
 
 | 状态 | 页面含义 | 后续处理 |
@@ -31,6 +37,8 @@ https://github.com/haipengTian/sub2api/actions/workflows/custom-auto-sync.yml
 | publish_failed | 发布失败 | 查看发布任务，重试已有标签 |
 | up_to_date | 二开已覆盖官方基础版本 | 若有更新的 custom 修订号，页面提供个人镜像升级命令 |
 | unknown | 暂时无法确认发布状态 | 保留当前版本，检查网络后刷新 |
+
+手工融合并发布后，下一次检查会核对官方提交已在个人 main 历史中、对应 custom Release 已公开，再清除旧冲突状态。尚未发布时记录为等待发布；已晋级但发布失败的候选仍保留原有重试入口。
 
 同一官方提交与个人基线失败后，定时任务不会反复建立分支。手动运行时勾选 `retry` 可以重新尝试。main 在验证期间推进会使本次晋级停止，下一次以新 main 重新融合。
 

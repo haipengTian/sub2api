@@ -111,7 +111,12 @@ def prepare(root, retry=False):
     current_base = tuple(int(n) for n in current.split('-')[0].split('.'))
     target_base = tuple(int(n) for n in STABLE.fullmatch(target).groups())
     previous, _ = load_state()
+    git(root, 'fetch', '--no-tags', f'https://github.com/{UPSTREAM}.git', 'refs/tags/' + target)
+    official = git(root, 'rev-parse', 'FETCH_HEAD^{commit}')
     if target_base <= current_base:
+        # A manually maintained custom release must retain the official history,
+        # not merely claim a sufficiently new version number.
+        git(root, 'merge-base', '--is-ancestor', official, baseline)
         # Promotion may have succeeded while the subsequent publication failed.
         # A manual retry publishes that exact existing tag, never generates a new candidate.
         if (retry and previous.get('status') in ('checking', 'publishing', 'checks_failed', 'publish_failed')
@@ -124,10 +129,25 @@ def prepare(root, retry=False):
             save_state(previous)
             outputs(ready='true', resume='true', sha=baseline, base=baseline, tag=previous['tag'])
             return
+        # Manual fusion/publication can resolve an older conflict report. Check
+        # the actual Release before reporting that publication is complete.
+        release_tag = 'v' + current
+        published = api(f'repos/{REPO}/releases/tags/{release_tag}', missing=True)
+        if (not published or published['draft']) and (
+                previous.get('candidate_sha') == baseline and previous.get('tag') == release_tag
+                and previous.get('status') in ('checking', 'publishing', 'checks_failed', 'publish_failed')):
+            # Keep the validated candidate and retry information if promotion
+            # succeeded but publication still needs recovery.
+            outputs(ready='false')
+            return
+        status = 'published' if published and not published['draft'] else 'waiting'
+        state = {'upstream_tag': target, 'upstream_sha': official, 'base_sha': baseline,
+                 'candidate_sha': baseline, 'tag': release_tag, 'status': status,
+                 'conflicts': []}
+        if any(previous.get(key) != value for key, value in state.items()):
+            save_state(state)
         outputs(ready='false')
         return
-    git(root, 'fetch', '--no-tags', f'https://github.com/{UPSTREAM}.git', 'refs/tags/' + target)
-    official = git(root, 'rev-parse', 'FETCH_HEAD^{commit}')
     if not retry and previous.get('base_sha') == baseline and previous.get('upstream_sha') == official:
         # No periodic retry loop for conflicts or failed checks. Manual retry remains possible.
         outputs(ready='false')
