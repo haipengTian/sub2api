@@ -1,20 +1,12 @@
 {
-  "upstream_tag": "v0.2.21",
-  "upstream_sha": "10ba8f9b4dc2e6023d4a9879ab77b21841babd10",
-  "base_sha": "2bbe9f96cb20a15320894d098fafdbe61104aab3",
-  "branch": "codex/sync-v0.2.21-custom.1-42974392100-1",
-  "tag": "v0.2.21-custom.1",
-  "status": "conflict",
-  "conflicts": [
-    ".gitignore",
-    "backend/internal/service/account_test_service_openai_image_test.go",
-    "frontend/package.json",
-    "frontend/pnpm-lock.yaml",
-    "frontend/src/components/payment/__tests__/SubscriptionPlanCard.spec.ts",
-    "frontend/src/views/admin/SettingsView.vue"
-  ],
-  "candidate_sha": "c69f5484daf3bf624063d3da3c9721b67f440346",
-  "checked_at": "2026-11-11T06:43:27.383062+00:00",
-  "run_id": "42974392100",
-  "run_url": "https://github.com/haipengTian/sub2api/actions/runs/42974392100"
+  "upstream_tag": "v0.2.22",
+  "upstream_sha": "b0fa9f3e6eeab1968a53e1289b69daa4bb40ca2b",
+  "base_sha": "df682e11135d5226651f00a0289c27f261e2b615",
+  "candidate_sha": "df682e11135d5226651f00a0289c27f261e2b615",
+  "tag": "v0.2.22-custom.1",
+  "status": "published",
+  "conflicts": [],
+  "checked_at": "2026-11-18T03:03:05.745576+00:00",
+  "run_id": "44227601910",
+  "run_url": "https://github.com/haipengTian/sub2api/actions/runs/44227601910"
 }
