@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"errors"
 	"mime"
 	"net/http"
 
 	pkghttputil "github.com/Wei-Shaw/sub2api/internal/pkg/httputil"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/requestmodel"
+	"github.com/Wei-Shaw/sub2api/internal/server/middleware"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
@@ -15,12 +15,10 @@ import (
 func (h *OpenAIGatewayHandler) MuseVideoGeneration(c *gin.Context) {
 	body, err := pkghttputil.ReadRequestBodyWithPrealloc(c.Request)
 	if err != nil {
-		status := http.StatusBadRequest
-		var maxErr *http.MaxBytesError
-		if errors.As(err, &maxErr) {
-			status = http.StatusRequestEntityTooLarge
+		if middleware.RejectRequestBodyReadError(c, "gateway.muse_video", err) {
+			return
 		}
-		h.errorResponse(c, status, "invalid_request_error", "Failed to read request body")
+		middleware.AbortWithRequestBodyReadFailure(c, "gateway.muse_video", err)
 		return
 	}
 	requestmodel.ResetRequestBody(c.Request, body)
