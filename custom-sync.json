@@ -1,12 +1,13 @@
 {
-  "upstream_tag": "v0.2.22",
-  "upstream_sha": "b0fa9f3e6eeab1968a53e1289b69daa4bb40ca2b",
-  "base_sha": "df682e11135d5226651f00a0289c27f261e2b615",
-  "candidate_sha": "df682e11135d5226651f00a0289c27f261e2b615",
-  "tag": "v0.2.22-custom.1",
-  "status": "published",
+  "upstream_tag": "v0.2.23",
+  "upstream_sha": "5af9afb588c4b014b3df9db7d4073af1f8ae01b6",
+  "base_sha": "7407fec55fb6d05f755cb4d77daa524023b87088",
+  "branch": "codex/sync-v0.2.23-custom.1-44340239486-1",
+  "tag": "v0.2.23-custom.1",
+  "status": "checking",
   "conflicts": [],
-  "checked_at": "2026-11-18T03:03:05.745576+00:00",
-  "run_id": "44227601910",
-  "run_url": "https://github.com/haipengTian/sub2api/actions/runs/44227601910"
+  "candidate_sha": "9274384b8f6dbe4e2d4aa086f586970d7d3463d4",
+  "checked_at": "2026-11-18T15:50:43.973638+00:00",
+  "run_id": "44340239486",
+  "run_url": "https://github.com/haipengTian/sub2api/actions/runs/44340239486"
 }
