@@ -4,10 +4,10 @@
   "base_sha": "9274384b8f6dbe4e2d4aa086f586970d7d3463d4",
   "branch": "codex/sync-v0.2.25-custom.1-45371650245-1",
   "tag": "v0.2.25-custom.1",
-  "status": "checking",
+  "status": "checks_failed",
   "conflicts": [],
   "candidate_sha": "dbbcff7f5d4cc89c937d82da4ddb83ef8a6ac427",
-  "checked_at": "2026-11-24T10:07:20.019094+00:00",
+  "checked_at": "2026-11-24T10:10:26.545815+00:00",
   "run_id": "45371650245",
   "run_url": "https://github.com/haipengTian/sub2api/actions/runs/45371650245"
 }
