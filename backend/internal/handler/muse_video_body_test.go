@@ -31,7 +31,7 @@ func TestMuseVideoGenerationRequestBodyFailures(t *testing.T) {
 		{"budget", strings.NewReader(`{"model":"muse-video","prompt":"waves"}`), 1, 1024, http.StatusServiceUnavailable, "Request body buffering capacity is exhausted", "1"},
 		{"timeout", iotest.ErrReader(os.ErrDeadlineExceeded), 1024, 1024, http.StatusRequestTimeout, "Timed out reading request body", ""},
 		{"truncated", iotest.ErrReader(io.ErrUnexpectedEOF), 1024, 1024, http.StatusBadRequest, "Failed to read request body", ""},
-		{"too large", strings.NewReader(`{"model":"muse-video"}`), 65536, 1, http.StatusRequestEntityTooLarge, "Request body is too large", ""},
+		{"too large", strings.NewReader(`{"model":"muse-video"}`), 65536, 1, http.StatusRequestEntityTooLarge, "Request body too large, limit is 1B", ""},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			router := gin.New()

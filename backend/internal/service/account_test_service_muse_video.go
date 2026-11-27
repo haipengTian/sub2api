@@ -110,7 +110,7 @@ func (s *AccountTestService) museAccountTestRequest(ctx context.Context, account
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
-	account.ApplyHeaderOverrides(req.Header)
+	account.ApplyHeaderOverrides(req.Context(), req.Header)
 	resp, err := s.httpUpstream.Do(req, s.grokTestProxyURL(account), account.ID, account.Concurrency)
 	if err != nil {
 		return nil, "", fmt.Errorf("muse request failed: %s", sanitizeUpstreamErrorMessage(err.Error()))
